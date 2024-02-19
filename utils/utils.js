@@ -1,6 +1,6 @@
 function generateHash(length = 10) {
-  if (length <= 0) {
-    throw new Error('Length must be greater than 0');
+  if (!Number.isInteger(length) || length <= 0) {
+    throw new Error('Length must be a positive integer greater than 0');
   }
   const charset =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
