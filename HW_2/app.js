@@ -12,16 +12,39 @@
  *  appenders: console, file, queue, elastic...
  */
 
-import logger from './lib/logger/logger.js';
+// appenders - це куди пишемо логи
+// log_score - це пріоритет логів, які логи ми хочемо виводити
 
-import color from './color.js';
-import fruit from './fruit.js';
-import { add } from './handler.js';
+import logger from "./lib/logger/logger.js";
 
-const log = logger.getLogger('app.js');
+import color from "./test_data/color.js";
+import fruit from "./test_data/fruit.js";
+import { add } from "./test_data/handler.js";
+
+import fs from "fs";
+
+const log = logger.getLogger("app.js");
 
 log.info(color);
-log.info(fruit);
-log.error('ERROR occur: My log');
+log.warn(fruit);
+log.error("ERROR occur: My log");
 
-add(3, 5);
+// add(3, 5);
+
+// const file = JSON.parse(fs.readFileSync("./logger.json", "utf-8"));
+
+// const file = fs.readFile("./logger.json", "utf-8", (err, data) => {
+//   if (err) {
+//     log.error(err);
+//   }
+//   console.log(data);
+//   return data;
+// });
+
+(async () => {
+  const file = await fs.promises.readFile("./logger.json", "utf-8");
+  //   console.log(file);
+})();
+
+// fs.writeFileSync("./logger2.txt", "\ntesttest", { flag: "a+" });
+// fs.appendFileSync("./logger2.txt", "\ntesttest");

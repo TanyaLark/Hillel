@@ -17,11 +17,13 @@ const logger = (category) => ({
 const appender = appenderStrategy.getAppender();
 
 function executeLog(level, category, message) {
+  // if щоб вивести лог певного рівня, наприклад INFO
   if (scoreLevel[level] <= config.scoreLevel) {
-    appender.log(Date.now(), level, category, message);
+    const dateLog = new Date().toISOString();
+    appender.log(dateLog, level, category, message);
   }
 }
-
+ // category - це назва файлу, звідки будуть писатися логи
 export default {
   getLogger(category) {
     return logger(category);
