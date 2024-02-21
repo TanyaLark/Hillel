@@ -16,13 +16,11 @@ function initConfig() {
   const logLevel = process.env.LOG_LEVEL?.toUpperCase();
   const appender = process.env.LOG_APPENDER?.toUpperCase();
 
-  if (logLevel) {
-    //TODO check for ifExist
+  if (logLevel && constants.level.hasOwnProperty(logLevel)) {
     config.logLevel = logLevel;
   }
 
-  if (appender) {
-    //TODO check for ifExist
+  if (appender && constants.appender.hasOwnProperty(appender)) {
     config.appender = appender;
   }
 
