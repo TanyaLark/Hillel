@@ -4,6 +4,7 @@ import consoleAppender from './appenders/console.js';
 
 const appenders = {
   [constants.appender.CONSOLE]: consoleAppender,
+  [constants.appender.FILE]: consoleAppender,
   [undefined]: consoleAppender,
 };
 function getAppender() {

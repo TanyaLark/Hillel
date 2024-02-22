@@ -12,18 +12,23 @@ const logger = (category) => ({
   error: (message) => {
     executeLog(level.ERROR, category, message);
   },
+  debug: (message) => {
+    executeLog(level.DEBUG, category, message);
+  },
+  trace: (message) => {
+    executeLog(level.TRACE, category, message);
+  },
 });
 
 const appender = appenderStrategy.getAppender();
 
 function executeLog(level, category, message) {
-  // if щоб вивести лог певного рівня, наприклад INFO
   if (scoreLevel[level] <= config.scoreLevel) {
     const dateLog = new Date().toISOString();
     appender.log(dateLog, level, category, message);
   }
 }
- // category - це назва файлу, звідки будуть писатися логи
+
 export default {
   getLogger(category) {
     return logger(category);
