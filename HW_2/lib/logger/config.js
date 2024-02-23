@@ -25,13 +25,15 @@ function initConfig() {
   if (logConfigFile) {
     try {
       const file = JSON.parse(fs.readFileSync(logConfigFile, "utf-8"));
+      const fileLogLevel = file.logLevel?.toUpperCase();
+      const fileAppender = file.appender?.toUpperCase();
 
-      if (constants.level.hasOwnProperty(file.logLevel)) {
-        config.logLevel = file.logLevel.toUpperCase();
+      if (constants.level.hasOwnProperty(fileLogLevel)) {
+        config.logLevel = fileLogLevel;
       }
 
-      if (constants.appender.hasOwnProperty(file.appender)) {
-        config.appender = file.appender.toUpperCase();
+      if (constants.appender.hasOwnProperty(fileAppender)) {
+        config.appender = fileAppender;
       }
     } catch (error) {}
   }

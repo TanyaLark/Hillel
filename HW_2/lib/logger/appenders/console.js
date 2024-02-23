@@ -1,11 +1,7 @@
-function log(date, level, category, message) {
-  console.log(formatMessage(date, level, category, message));
-}
+import * as helper from "../helpers/message.helper.js";
 
-function formatMessage(date, level, category, message) {
-  return `Date: ${date}, category:${category}, level:${level}, message:${JSON.stringify(
-    message
-  )}`;
+function log(date, level, category, message) {
+  console.log(helper.formatMessage(date, level, category, message));
 }
 
 export default { log };
