@@ -12,10 +12,6 @@
  *  appenders: console, file, queue, elastic...
  */
 
-// appenders - це куди пишемо логи
-// log_score - це пріоритет логів, які логи ми хочемо виводити
-// category - це назва файлу, звідки будуть писатися логи
-
 import logger from "./lib/logger/logger.js";
 
 import color from "./test_data/color.js";
@@ -31,6 +27,3 @@ log.debug(color);
 log.trace(fruit);
 
 add(3, 5);
-
-// fs.writeFileSync("./logger2.txt", "\ntesttest", { flag: "a+" });
-// fs.appendFileSync("./logger2.txt", "\ntesttest");
