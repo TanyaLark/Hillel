@@ -3,7 +3,7 @@ import * as constants from "../constants.js";
 import fs from "fs";
 import path from "path";
 
-function writeLogInFile(date, level, category, message) {
+function log(date, level, category, message) {
   const directory = `./log_output`;
   const fileName = `app.log`;
   const filePath = path.join(directory, fileName);
@@ -14,7 +14,7 @@ function writeLogInFile(date, level, category, message) {
   }
 
   if (level === constants.level.ERROR) {
-    writeErrorLogInFile(directory, JSON.stringify(logMessage));
+    logError(directory, JSON.stringify(logMessage));
   }
 
   fs.writeFileSync(filePath, `${logMessage}\n`, { flag: "a+" }, (err) => {
@@ -25,7 +25,7 @@ function writeLogInFile(date, level, category, message) {
   });
 }
 
-function writeErrorLogInFile(directory, logMessage) {
+function logError(directory, logMessage) {
   const errorLogFileName = `app_error.js`;
   const errorLogFilePath = path.join(directory, errorLogFileName);
 
@@ -42,4 +42,4 @@ function writeErrorLogInFile(directory, logMessage) {
   );
 }
 
-export default { writeLogInFile };
+export default { log };

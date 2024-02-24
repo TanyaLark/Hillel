@@ -25,13 +25,7 @@ const appender = appenderStrategy.getAppender();
 function executeLog(level, category, message) {
   if (scoreLevel[level] <= config.scoreLevel) {
     const dateLog = new Date().toISOString();
-    try {
-      appender.log(dateLog, level, category, message);
-    } catch (error) {}
-
-    try {
-      appender.writeLogInFile(dateLog, level, category, message);
-    } catch (error) {}
+    appender.log(dateLog, level, category, message);
   }
 }
 
