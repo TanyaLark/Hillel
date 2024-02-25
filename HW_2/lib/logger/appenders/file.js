@@ -24,7 +24,7 @@ function log(date, level, category, message) {
     logError(logMessage);
   }
 
-  fs.writeFileSync(filePath, logMessage, { flag: "a+" }, (err) => {
+  fs.writeFile(filePath, logMessage, { flag: "a+" }, (err) => {
     if (err) {
       console.error("Error writing log file:", err);
       return;
@@ -35,7 +35,7 @@ function log(date, level, category, message) {
 function logError(logMessage) {
   const errorLogFilePath = path.join(directory, errorLogFileName);
 
-  fs.writeFileSync(errorLogFilePath, logMessage, { flag: "a+" }, (err) => {
+  fs.writeFile(errorLogFilePath, logMessage, { flag: "a+" }, (err) => {
     if (err) {
       console.error("Error writing log file:", err);
       return;
