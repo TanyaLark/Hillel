@@ -2,12 +2,18 @@ import * as helper from "../helpers/message.helper.js";
 import * as constants from "../constants.js";
 import fs from "fs";
 import path from "path";
+import config from "../config.js";
 
 const directory = `./log_output`;
-const fileName = `app.log`;
 const errorLogFileName = `app_error.js`;
 
+function getFileName(config) {
+  const fileFormat = config.logFormat.toLowerCase();
+  return `app.${fileFormat}`;
+}
+
 function log(date, level, category, message) {
+  const fileName = getFileName(config);
   const filePath = path.join(directory, fileName);
   const logMessage = `${helper.formatMessage(
     date,
