@@ -3,6 +3,7 @@ import * as messageStrategy from "../message/messageStrategy.js";
 import fs from "fs";
 import path from "path";
 import config from "../config.js";
+import setTextMessage from "../message/message-text.js";
 
 const directory = `./log_output`;
 const errorLogFileName = `app_error.js`;
@@ -28,7 +29,11 @@ function log(date, level, category, message) {
   }
 
   if (level === constants.level.ERROR) {
-    logError(logMessage);
+    const errLogMessage = setTextMessage.formatMessage( date,
+      level,
+      category,
+      message)
+    logError(errLogMessage);
   }
 
   fs.writeFile(filePath, logMessage, { flag: "a+" }, (err) => {
