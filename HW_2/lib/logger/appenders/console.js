@@ -1,4 +1,4 @@
-import * as helper from "../helpers/message.helper.js";
+import * as helper from "../message/message-text.js";
 
 function log(date, level, category, message) {
   console.log(helper.formatMessage(date, level, category, message));

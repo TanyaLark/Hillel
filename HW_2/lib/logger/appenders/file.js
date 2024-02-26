@@ -1,11 +1,12 @@
-import * as helper from "../helpers/message.helper.js";
 import * as constants from "../constants.js";
+import * as messageStrategy from "../message/messageStrategy.js";
 import fs from "fs";
 import path from "path";
 import config from "../config.js";
 
 const directory = `./log_output`;
 const errorLogFileName = `app_error.js`;
+const messageFromStrategy = messageStrategy.getMessage();
 
 function getFileName(config) {
   const fileFormat = config.logFormat.toLowerCase();
@@ -15,12 +16,12 @@ function getFileName(config) {
 function log(date, level, category, message) {
   const fileName = getFileName(config);
   const filePath = path.join(directory, fileName);
-  const logMessage = `${helper.formatMessage(
+  const logMessage = messageFromStrategy.formatMessage(
     date,
     level,
     category,
     message
-  )}\n`;
+  );
 
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
