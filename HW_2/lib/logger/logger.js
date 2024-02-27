@@ -1,6 +1,6 @@
-import config from './config.js';
-import { scoreLevel, level } from './constants.js';
-import * as appenderStrategy from './appenderStrategy.js';
+import config from "./config.js";
+import { scoreLevel, level } from "./constants.js";
+import * as appenderStrategy from "./appenderStrategy.js";
 
 const logger = (category) => ({
   info: (...message) => {
@@ -20,12 +20,15 @@ const logger = (category) => ({
   },
 });
 
-const appender = appenderStrategy.getAppender();
-
 function executeLog(level, category, message) {
   if (scoreLevel[level] <= config.scoreLevel) {
     const dateLog = new Date().toISOString();
-    appender.log(dateLog, level, category, message);
+    const appenders = config.appenders;
+
+    for (let i = 0; i < appenders.length; i++) {
+      const appender = appenderStrategy.getAppender(appenders[i]);
+      appender.log(dateLog, level, category, message);
+    }
   }
 }
 

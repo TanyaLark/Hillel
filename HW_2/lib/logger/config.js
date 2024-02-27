@@ -4,27 +4,35 @@ import fs from "fs";
 const defaultConfig = {
   logLevel: constants.level.INFO,
   scoreLevel: constants.scoreLevel[constants.level.INFO],
-  appender: constants.appender.CONSOLE,
+  appenders: [constants.appender.CONSOLE],
 };
 
-function setConfigLevelAndAppender(config, level, appender) {
+function setConfigLevel(config, level) {
   if (constants.level.hasOwnProperty(level?.toUpperCase())) {
     config.logLevel = level?.toUpperCase();
   }
+}
 
-  if (constants.appender.hasOwnProperty(appender?.toUpperCase())) {
-    config.appender = appender?.toUpperCase();
-  }
+function setConfigAppender(config, appenders, logFormat) {
+  config.appenders = [];
+  appenders.map((appender) => {
+    const appenderUpper = appender.toUpperCase();
+    if (constants.appender.hasOwnProperty(appenderUpper)) {
+      config.appenders.push(appenderUpper);
+    }
+    if (appenderUpper === constants.appender.FILE) {
+      if (!logFormat) {
+        logFormat = constants.logFormat.TEXT;
+      }
+      setIfAppenderFile(config, logFormat);
+    }
+  });
 }
 
 function setIfAppenderFile(config, logFormat) {
-  if (!logFormat) {
-    config.logFormat = constants.logFormat.TEXT;
-    return;
-  }
-
-  if (constants.logFormat.hasOwnProperty(logFormat?.toUpperCase())) {
-    config.logFormat = logFormat?.toUpperCase();
+  const logFormatUpper = logFormat?.toUpperCase();
+  if (constants.logFormat.hasOwnProperty(logFormatUpper)) {
+    config.logFormat = constants.logFormat[logFormatUpper];
   } else {
     config.logFormat = constants.logFormat.TEXT;
   }
@@ -33,14 +41,10 @@ function setIfAppenderFile(config, logFormat) {
 function getConfigFromJSONFile(filePath, config) {
   try {
     const file = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-    const { logLevel, appender } = file;
+    const { logLevel, appenders, logFormat } = file;
 
-    setConfigLevelAndAppender(config, logLevel, appender);
-
-    if (config.appender === constants.appender.FILE) {
-      const { logFormat } = file;
-      setIfAppenderFile(config, logFormat);
-    }
+    setConfigLevel(config, logLevel);
+    setConfigAppender(config, appenders, logFormat);
   } catch (error) {}
 }
 
@@ -50,25 +54,25 @@ function enrichConfig(config) {
 
 function initConfig() {
   // process.env["LOG_LEVEL"] = "debug";
-  // process.env["LOG_APPENDER"] = "file";
+  // process.env["LOG_APPENDERS"] = ["console","file"];
   // process.env["LOG_FORMAT"] = "json";
   // process.env["LOG_CONFIG_FILE"] = "./logger.json";
 
   const config = defaultConfig;
 
   const logLevel = process.env.LOG_LEVEL?.toUpperCase();
-  const appender = process.env.LOG_APPENDER?.toUpperCase();
+  const appenders = process.env.LOG_APPENDERS?.toUpperCase().split(",");
   const logFormat = process.env.LOG_FORMAT?.toUpperCase();
   const logConfigFile = process.env.LOG_CONFIG_FILE; //path to config file
 
-  if (logLevel && appender) {
-    setConfigLevelAndAppender(config, logLevel, appender);
-    if (appender === constants.appender.FILE) {
-      setIfAppenderFile(config, logFormat);
-    }
+  //set config from environment variables
+  if (logLevel && appenders) {
+    setConfigLevel(config, logLevel);
+    setConfigAppender(config, appenders, logFormat);
   }
 
-  if (!logLevel && !appender && logConfigFile) {
+  //set config from file
+  if (logConfigFile) {
     getConfigFromJSONFile(logConfigFile, config);
   }
 
