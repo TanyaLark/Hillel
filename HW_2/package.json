@@ -1,0 +1,12 @@
+{
+  "name": "hw_2",
+  "version": "1.0.0",
+  "description": "Logger",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
