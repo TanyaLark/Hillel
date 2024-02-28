@@ -46,7 +46,9 @@ function getConfigFromJSONFile(filePath, config) {
 
     setConfigLevel(config, logLevel);
     setConfigAppender(config, appenders, logFormat);
-  } catch (error) {}
+  } catch (error) {
+    console.warn("Error reading config file", error.message);
+  }
 }
 
 function enrichConfig(config) {
