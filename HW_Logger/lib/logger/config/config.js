@@ -1,5 +1,5 @@
-import * as constants from "./constants.js";
-import fs from "fs";
+import * as constants from '../constants.js';
+import fs from 'fs';
 
 const defaultConfig = {
   logLevel: constants.level.INFO,
@@ -23,7 +23,7 @@ function setConfigAppender(config, appenders, logFormat) {
     }
     if (appenderUpper === constants.appender.FILE) {
       if (!logFormat) {
-        logFormat = constants.logFormat.TEXT;
+        logFormat = constants.constants.TEXT;
       }
       setIfAppenderFile(config, logFormat);
     }
@@ -32,22 +32,22 @@ function setConfigAppender(config, appenders, logFormat) {
 
 function setIfAppenderFile(config, logFormat) {
   const logFormatUpper = logFormat?.toUpperCase();
-  if (constants.logFormat.hasOwnProperty(logFormatUpper)) {
-    config.logFormat = constants.logFormat[logFormatUpper];
+  if (constants.constants.hasOwnProperty(logFormatUpper)) {
+    config.logFormat = constants.constants[logFormatUpper];
   } else {
-    config.logFormat = constants.logFormat.TEXT;
+    config.logFormat = constants.constants.TEXT;
   }
 }
 
 function getConfigFromJSONFile(filePath, config) {
   try {
-    const file = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+    const file = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
     const { logLevel, appenders, logFormat } = file;
 
     setConfigLevel(config, logLevel);
     setConfigAppender(config, appenders, logFormat);
   } catch (error) {
-    console.warn("Error reading config file", error.message);
+    console.warn('Error reading config file', error.message);
   }
 }
 
@@ -64,7 +64,7 @@ function initConfig() {
   const config = defaultConfig;
 
   const logLevel = process.env.LOG_LEVEL?.toUpperCase();
-  const appenders = process.env.LOG_APPENDERS?.toUpperCase().split(",");
+  const appenders = process.env.LOG_APPENDERS?.toUpperCase().split(',');
   const logFormat = process.env.LOG_FORMAT?.toUpperCase();
   const logConfigFile = process.env.LOG_CONFIG_FILE; //path to config file
 
@@ -80,7 +80,7 @@ function initConfig() {
   }
 
   enrichConfig(config);
-  console.log("config ===>", config);
+  console.log('config ===>', config);
   return config;
 }
 

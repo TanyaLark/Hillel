@@ -1,9 +1,9 @@
-import * as constants from "../constants.js";
-import * as messageStrategy from "../message/messageStrategy.js";
-import fs from "fs";
-import path from "path";
-import config from "../config.js";
-import setTextMessage from "../message/message-text.js";
+import * as constants from '../constants.js';
+import * as messageStrategy from '../formatters/formatterStrategy.js';
+import fs from 'fs';
+import path from 'path';
+import config from '../config/config.js';
+import setTextMessage from '../formatters/format-default-txt.js';
 
 const directory = `./log_output`;
 const errorLogFileName = `app_error.js`;
@@ -12,7 +12,7 @@ const messageFromStrategy = messageStrategy.getMessage();
 function getFileName(config) {
   const fileFormat = config.logFormat.toLowerCase();
 
-  if (config.logFormat === constants.logFormat.CSV) {
+  if (config.logFormat === constants.constants.CSV) {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}_${
       currentDate.getMonth() + 1
@@ -46,9 +46,9 @@ function log(date, level, category, message) {
     logError(errLogMessage);
   }
 
-  fs.writeFile(filePath, logMessage, { flag: "a+" }, (err) => {
+  fs.writeFile(filePath, logMessage, { flag: 'a+' }, (err) => {
     if (err) {
-      console.error("Error writing log file:", err);
+      console.error('Error writing log file:', err);
       return;
     }
   });
@@ -57,9 +57,9 @@ function log(date, level, category, message) {
 function logError(logMessage) {
   const errorLogFilePath = path.join(directory, errorLogFileName);
 
-  fs.writeFile(errorLogFilePath, logMessage, { flag: "a+" }, (err) => {
+  fs.writeFile(errorLogFilePath, logMessage, { flag: 'a+' }, (err) => {
     if (err) {
-      console.error("Error writing log file:", err);
+      console.error('Error writing log file:', err);
       return;
     }
   });
