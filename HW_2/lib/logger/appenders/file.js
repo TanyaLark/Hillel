@@ -11,6 +11,14 @@ const messageFromStrategy = messageStrategy.getMessage();
 
 function getFileName(config) {
   const fileFormat = config.logFormat.toLowerCase();
+
+  if (config.logFormat === constants.logFormat.CSV) {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}_${
+      currentDate.getMonth() + 1
+    }_${currentDate.getFullYear()}`;
+    return `app.${formattedDate}.csv`;
+  }
   return `app.${fileFormat}`;
 }
 
@@ -29,10 +37,12 @@ function log(date, level, category, message) {
   }
 
   if (level === constants.level.ERROR) {
-    const errLogMessage = setTextMessage.formatMessage( date,
+    const errLogMessage = setTextMessage.formatMessage(
+      date,
       level,
       category,
-      message)
+      message
+    );
     logError(errLogMessage);
   }
 
