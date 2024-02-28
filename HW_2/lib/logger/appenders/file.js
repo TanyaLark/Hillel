@@ -1,30 +1,52 @@
-import * as helper from "../helpers/message.helper.js";
 import * as constants from "../constants.js";
+import * as messageStrategy from "../message/messageStrategy.js";
 import fs from "fs";
 import path from "path";
+import config from "../config.js";
+import setTextMessage from "../message/message-text.js";
 
 const directory = `./log_output`;
-const fileName = `app.log`;
 const errorLogFileName = `app_error.js`;
+const messageFromStrategy = messageStrategy.getMessage();
+
+function getFileName(config) {
+  const fileFormat = config.logFormat.toLowerCase();
+
+  if (config.logFormat === constants.logFormat.CSV) {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}_${
+      currentDate.getMonth() + 1
+    }_${currentDate.getFullYear()}`;
+    return `app.${formattedDate}.csv`;
+  }
+  return `app.${fileFormat}`;
+}
 
 function log(date, level, category, message) {
+  const fileName = getFileName(config);
   const filePath = path.join(directory, fileName);
-  const logMessage = `${helper.formatMessage(
+  const logMessage = messageFromStrategy.formatMessage(
     date,
     level,
     category,
     message
-  )}\n`;
+  );
 
   if (!fs.existsSync(directory)) {
     fs.mkdirSync(directory, { recursive: true });
   }
 
   if (level === constants.level.ERROR) {
-    logError(logMessage);
+    const errLogMessage = setTextMessage.formatMessage(
+      date,
+      level,
+      category,
+      message
+    );
+    logError(errLogMessage);
   }
 
-  fs.writeFileSync(filePath, logMessage, { flag: "a+" }, (err) => {
+  fs.writeFile(filePath, logMessage, { flag: "a+" }, (err) => {
     if (err) {
       console.error("Error writing log file:", err);
       return;
@@ -35,7 +57,7 @@ function log(date, level, category, message) {
 function logError(logMessage) {
   const errorLogFilePath = path.join(directory, errorLogFileName);
 
-  fs.writeFileSync(errorLogFilePath, logMessage, { flag: "a+" }, (err) => {
+  fs.writeFile(errorLogFilePath, logMessage, { flag: "a+" }, (err) => {
     if (err) {
       console.error("Error writing log file:", err);
       return;

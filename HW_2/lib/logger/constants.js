@@ -19,4 +19,11 @@ const appender = {
   FILE: 'FILE',
 };
 
-export { level, scoreLevel, appender };
+const logFormat = {
+  JSON: 'JSON',
+  TEXT: 'TXT',
+  CSV: 'CSV',
+  LOG: 'LOG',
+};
+
+export { level, scoreLevel, appender, logFormat };
