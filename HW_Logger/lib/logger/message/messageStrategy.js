@@ -1,5 +1,5 @@
 import * as constants from "../constants.js";
-import config from "../../logger/config.js";
+import config from "../config.js";
 import formatMessage from "./message-text.js";
 import formatMessageJSON from "./message-json.js";
 import formatMessageCSV from "./message-csv.js";
