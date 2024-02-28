@@ -8,8 +8,9 @@ const defaultConfig = {
 };
 
 function setConfigLevel(config, level) {
-  if (constants.level.hasOwnProperty(level?.toUpperCase())) {
-    config.logLevel = level?.toUpperCase();
+  const logLevel = level?.toUpperCase();
+  if (constants.level.hasOwnProperty(logLevel)) {
+    config.logLevel = logLevel;
   }
 }
 
