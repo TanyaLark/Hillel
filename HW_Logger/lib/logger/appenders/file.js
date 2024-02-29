@@ -10,9 +10,9 @@ const errorLogFileName = `app_error.js`;
 const messageFromStrategy = messageStrategy.getMessage();
 
 function getFileName(config) {
-  const fileFormat = config.logFormat.toLowerCase();
+  const fileFormat = config.formatter.toLowerCase();
 
-  if (config.logFormat === constants.constants.CSV) {
+  if (config.formatter === constants.formatters.CSV) {
     const currentDate = new Date();
     const formattedDate = `${currentDate.getDate()}_${
       currentDate.getMonth() + 1

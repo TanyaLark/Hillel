@@ -1,83 +1,57 @@
 import * as constants from '../constants.js';
-import fs from 'fs';
+import { validateLogLevel, validateAppenders } from './validator.js';
+import { getConfigFromFile } from './configFile.js';
 
 const defaultConfig = {
   logLevel: constants.level.INFO,
   scoreLevel: constants.scoreLevel[constants.level.INFO],
   appenders: [constants.appender.CONSOLE],
+  formatter: constants.formatters.TEXT,
 };
-
-function setConfigLevel(config, level) {
-  const logLevel = level?.toUpperCase();
-  if (constants.level.hasOwnProperty(logLevel)) {
-    config.logLevel = logLevel;
-  }
-}
-
-function setConfigAppender(config, appenders, logFormat) {
-  config.appenders = [];
-  appenders.map((appender) => {
-    const appenderUpper = appender.toUpperCase();
-    if (constants.appender.hasOwnProperty(appenderUpper)) {
-      config.appenders.push(appenderUpper);
-    }
-    if (appenderUpper === constants.appender.FILE) {
-      if (!logFormat) {
-        logFormat = constants.constants.TEXT;
-      }
-      setIfAppenderFile(config, logFormat);
-    }
-  });
-}
-
-function setIfAppenderFile(config, logFormat) {
-  const logFormatUpper = logFormat?.toUpperCase();
-  if (constants.constants.hasOwnProperty(logFormatUpper)) {
-    config.logFormat = constants.constants[logFormatUpper];
-  } else {
-    config.logFormat = constants.constants.TEXT;
-  }
-}
-
-function getConfigFromJSONFile(filePath, config) {
-  try {
-    const file = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
-    const { logLevel, appenders, logFormat } = file;
-
-    setConfigLevel(config, logLevel);
-    setConfigAppender(config, appenders, logFormat);
-  } catch (error) {
-    console.warn('Error reading config file', error.message);
-  }
-}
 
 function enrichConfig(config) {
   config.scoreLevel = constants.scoreLevel[config.logLevel];
 }
 
-function initConfig() {
-  // process.env["LOG_LEVEL"] = "debug";
-  // process.env["LOG_APPENDERS"] = ["console","file"];
-  // process.env["LOG_FORMAT"] = "json";
-  // process.env["LOG_CONFIG_FILE"] = "./logger.json";
-
-  const config = defaultConfig;
-
+function getConfigFromEnvs() {
   const logLevel = process.env.LOG_LEVEL?.toUpperCase();
-  const appenders = process.env.LOG_APPENDERS?.toUpperCase().split(',');
+  const appenders = process.env.LOG_APPENDERS?.toUpperCase();
   const logFormat = process.env.LOG_FORMAT?.toUpperCase();
-  const logConfigFile = process.env.LOG_CONFIG_FILE; //path to config file
 
-  //set config from environment variables
-  if (logLevel && appenders) {
-    setConfigLevel(config, logLevel);
-    setConfigAppender(config, appenders, logFormat);
+  const config = {};
+
+  if (validateLogLevel(logLevel)) {
+    config.logLevel = logLevel;
   }
 
-  //set config from file
-  if (logConfigFile) {
-    getConfigFromJSONFile(logConfigFile, config);
+  if (appenders) {
+    const validAppenders = validateAppenders(appenders);
+    if (validAppenders.length > 0) {
+      config.appenders = validAppenders;
+    }
   }
+
+  if (config.appenders && config.appenders.includes('FILE')) {
+    config.formatter =
+      constants.formatters[logFormat] || constants.formatters.TEXT;
+  }
+
+  return config;
+}
+
+function initConfig() {
+  // process.env['LOG_LEVEL'] = 'debug';
+  // process.env['LOG_APPENDERS'] = 'console, file';
+  // process.env['LOG_FORMAT'] = 'csv';
+  // process.env['LOG_CONFIG_FILE'] = './logger.json';
+
+  const filePath = process.env.LOG_CONFIG_FILE; 
+
+  const config = Object.assign(
+    defaultConfig,
+    getConfigFromFile(filePath),
+    getConfigFromEnvs()
+  );
 
   enrichConfig(config);
   console.log('config ===>', config);

@@ -5,7 +5,7 @@ function formatMessage(date, level, category, message) {
 
   if (!headersAdded) {
     headersAdded = true;
-    return `Date,category,level,message\n${date},${category},${level},"${escapedMessage}"\n`;
+    return `Date,Category,Level,Message\n${date},${category},${level},"${escapedMessage}"\n`;
   }
 
   return `${date},${category},${level},"${escapedMessage}"\n`;

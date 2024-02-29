@@ -11,7 +11,7 @@ const formatters = {
   [undefined]: formatMessage,
 };
 function getMessage() {
-  return formatters[config.logFormat];
+  return formatters[config.formatter];
 }
 
 export { getMessage };
