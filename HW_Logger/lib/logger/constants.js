@@ -26,4 +26,7 @@ const formatters = {
   LOG: 'LOG',
 };
 
-export { level, scoreLevel, appender, formatters };
+const directory = `./log_output`;
+const errorLogFileName = `app_error.js`;
+
+export { level, scoreLevel, appender, formatters, directory, errorLogFileName };

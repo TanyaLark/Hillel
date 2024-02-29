@@ -5,8 +5,6 @@ import path from 'path';
 import config from '../config/config.js';
 import setTextMessage from '../formatters/format-default-txt.js';
 
-const directory = `./log_output`;
-const errorLogFileName = `app_error.js`;
 const messageFromStrategy = messageStrategy.getMessage();
 
 function getFileName(config) {
@@ -22,9 +20,14 @@ function getFileName(config) {
   return `app.${fileFormat}`;
 }
 
-function log(date, level, category, message) {
+export function getFilePath(config) {
   const fileName = getFileName(config);
-  const filePath = path.join(directory, fileName);
+  return path.join(constants.directory, fileName);
+}
+
+function log(date, level, category, message) {
+  const filePath = getFilePath(config);
+
   const logMessage = messageFromStrategy.formatMessage(
     date,
     level,
@@ -32,8 +35,8 @@ function log(date, level, category, message) {
     message
   );
 
-  if (!fs.existsSync(directory)) {
-    fs.mkdirSync(directory, { recursive: true });
+  if (!fs.existsSync(constants.directory)) {
+    fs.mkdirSync(constants.directory, { recursive: true });
   }
 
   if (level === constants.level.ERROR) {
@@ -55,7 +58,10 @@ function log(date, level, category, message) {
 }
 
 function logError(logMessage) {
-  const errorLogFilePath = path.join(directory, errorLogFileName);
+  const errorLogFilePath = path.join(
+    constants.directory,
+    constants.errorLogFileName
+  );
 
   fs.writeFile(errorLogFilePath, logMessage, { flag: 'a+' }, (err) => {
     if (err) {
