@@ -1,11 +1,11 @@
 import * as constants from '../constants.js';
-import * as messageStrategy from '../formatters/formatterStrategy.js';
+import * as formatterStrategy from '../formatters/formatterStrategy.js';
 import fs from 'fs';
 import path from 'path';
 import config from '../config/config.js';
 import setTextMessage from '../formatters/format-default-txt.js';
 
-const messageFromStrategy = messageStrategy.getMessage();
+const formatterFromStrategy = formatterStrategy.getFormatter();
 
 function getFileName(config) {
   const fileFormat = config.formatter.toLowerCase();
@@ -28,7 +28,7 @@ export function getFilePath(config) {
 function log(date, level, category, message) {
   const filePath = getFilePath(config);
 
-  const logMessage = messageFromStrategy.formatMessage(
+  const logMessage = formatterFromStrategy.formatMessage(
     date,
     level,
     category,
