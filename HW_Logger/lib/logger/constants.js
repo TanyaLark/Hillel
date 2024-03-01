@@ -19,11 +19,14 @@ const appender = {
   FILE: 'FILE',
 };
 
-const logFormat = {
+const formatters = {
   JSON: 'JSON',
   TEXT: 'TXT',
   CSV: 'CSV',
   LOG: 'LOG',
 };
 
-export { level, scoreLevel, appender, logFormat };
+const directory = `./log_output`;
+const errorLogFileName = `app_error.js`;
+
+export { level, scoreLevel, appender, formatters, directory, errorLogFileName };
