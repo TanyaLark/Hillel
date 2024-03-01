@@ -1,36 +1,39 @@
 import config from './config/config.js';
 import { scoreLevel, level } from './constants.js';
 import * as appenderStrategy from './appenders/appenderStrategy.js';
+import { EventEmitter } from 'node:events';
 
-const logger = (category) => ({
-  info: (...message) => {
-    executeLog(level.INFO, category, message);
-  },
-  warn: (...message) => {
-    executeLog(level.WARN, category, message);
-  },
-  error: (...message) => {
-    executeLog(level.ERROR, category, message);
-  },
-  debug: (...message) => {
-    executeLog(level.DEBUG, category, message);
-  },
-  trace: (...message) => {
-    executeLog(level.TRACE, category, message);
-  },
-});
+const logEventEmitter = new EventEmitter();
 
-function executeLog(level, category, message) {
+logEventEmitter.on('executeLog', function executeLog(level, category, message) {
   if (scoreLevel[level] <= config.scoreLevel) {
     const dateLog = new Date().toISOString();
     const appenders = config.appenders;
 
-    for (let i = 0; i < appenders.length; i++) {
-      const appender = appenderStrategy.getAppender(appenders[i]);
+    appenders.forEach((appenderName) => {
+      const appender = appenderStrategy.getAppender(appenderName);
       appender.log(dateLog, level, category, message);
-    }
+    });
   }
-}
+});
+
+const logger = (category) => ({
+  info: (...message) => {
+    logEventEmitter.emit('executeLog', level.INFO, category, message);
+  },
+  warn: (...message) => {
+    logEventEmitter.emit('executeLog', level.WARN, category, message);
+  },
+  error: (...message) => {
+    logEventEmitter.emit('executeLog', level.ERROR, category, message);
+  },
+  debug: (...message) => {
+    logEventEmitter.emit('executeLog', level.DEBUG, category, message);
+  },
+  trace: (...message) => {
+    logEventEmitter.emit('executeLog', level.TRACE, category, message);
+  },
+});
 
 export default {
   getLogger(category) {
