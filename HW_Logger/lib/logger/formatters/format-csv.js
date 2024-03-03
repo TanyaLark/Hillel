@@ -1,11 +1,14 @@
+import * as constants from '../constants.js';
 import config from '../config/config.js';
-import { getFilePath } from '../appenders/file.js';
+import { getFilePath, getFileName } from '../appenders/file.js';
 import { existsSync } from 'node:fs';
 
-function formatMessage(date, level, category, message) {
+export function formatMessage(date, level, category, message) {
   try {
     const escapedMessage = JSON.stringify(message).replace(/"/g, '""');
-    const filePath = getFilePath(config);
+    const extension = config.formatter?.toLowerCase();
+    const fileName = getFileName(date, extension);
+    const filePath = getFilePath(constants.directory, fileName);
     let headersAdded = existsSync(filePath);
 
     if (!headersAdded) {
@@ -18,5 +21,3 @@ function formatMessage(date, level, category, message) {
     console.error('Error in csv formatter: ', error.message);
   }
 }
-
-export default { formatMessage };

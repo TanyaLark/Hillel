@@ -1,74 +1,70 @@
 import * as constants from '../constants.js';
-import * as formatterStrategy from '../formatters/formatterStrategy.js';
 import fs from 'fs';
 import path from 'path';
 import config from '../config/config.js';
-import setTextMessage from '../formatters/format-default-txt.js';
+import { formatMessage } from '../formatters/format-default-txt.js';
 
-const formatterFromStrategy = formatterStrategy.getFormatter();
+const extension = config.formatter?.toLowerCase();
+const directory = constants.directory;
+const errorLogFileName = constants.errorLogFileName;
 
-function getFileName(config) {
-  const fileFormat = config.formatter.toLowerCase();
+function log(formatter) {
+  return function (date, level, category, message) {
+    const fileName = getFileName(date, extension);
+    const filePath = getFilePath(directory, fileName);
+    const errorLogFilePath = getFilePath(directory, errorLogFileName);
+    const logMessage = formatter(date, level, category, message);
 
-  if (config.formatter === constants.formatters.CSV) {
-    const currentDate = new Date();
-    const formattedDate = `${currentDate.getDate()}_${
-      currentDate.getMonth() + 1
-    }_${currentDate.getFullYear()}`;
-    return `app.${formattedDate}.csv`;
+    if (!fs.existsSync(constants.directory)) {
+      fs.mkdirSync(constants.directory, { recursive: true });
+    }
+
+    if (level === constants.level.ERROR) {
+      const errLogMessage = formatMessage(date, level, category, message);
+      writeLog(errorLogFilePath, errLogMessage);
+    }
+
+    writeLog(filePath, logMessage);
+  };
+}
+
+function writeLog(filePath, message) {
+  fs.writeFile(filePath, message, { flag: 'a+' }, (err) => {
+    if (err) {
+      console.error('Error writing log file:', err);
+      return;
+    }
+  });
+}
+
+function getFormattedDateForCSVFileName(dateString) {
+  //example dateString = "2024-03-03T15:51:14.092Z";
+  const date = new Date(dateString);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${month}_${day}_${year}`;
+}
+
+export function getFileName(date, formatter) {
+  const fileFormat = formatter.toUpperCase();
+
+  if (fileFormat === constants.formatters.CSV) {
+    return `app_${getFormattedDateForCSVFileName(date)}.csv`;
   }
   return `app.${fileFormat}`;
 }
 
-export function getFilePath(config) {
-  const fileName = getFileName(config);
-  return path.join(constants.directory, fileName);
+export function getFilePath(directory, fileName) {
+  return path.join(directory, fileName);
 }
 
-function log(date, level, category, message) {
-  const filePath = getFilePath(config);
-
-  const logMessage = formatterFromStrategy.formatMessage(
-    date,
-    level,
-    category,
-    message
-  );
-
-  if (!fs.existsSync(constants.directory)) {
-    fs.mkdirSync(constants.directory, { recursive: true });
-  }
-
-  if (level === constants.level.ERROR) {
-    const errLogMessage = setTextMessage.formatMessage(
-      date,
-      level,
-      category,
-      message
-    );
-    logError(errLogMessage);
-  }
-
-  fs.writeFile(filePath, logMessage, { flag: 'a+' }, (err) => {
-    if (err) {
-      console.error('Error writing log file:', err);
-      return;
-    }
-  });
+function init(formatter) {
+  return {
+    log: log(formatter),
+  };
 }
 
-function logError(logMessage) {
-  const errorLogFilePath = path.join(
-    constants.directory,
-    constants.errorLogFileName
-  );
-
-  fs.writeFile(errorLogFilePath, logMessage, { flag: 'a+' }, (err) => {
-    if (err) {
-      console.error('Error writing log file:', err);
-      return;
-    }
-  });
-}
-
-export default { log };
+export default init;
