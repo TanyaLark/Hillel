@@ -1,6 +1,9 @@
 import config from './config/config.js';
 import { scoreLevel, level } from './constants.js';
 import * as appenderStrategy from './appenders/appenderStrategy.js';
+import { EventEmitter } from 'events';
+
+export const eventEmitter = new EventEmitter();
 
 const logger = (category) => ({
   info: (...message) => {
@@ -25,10 +28,12 @@ function executeLog(level, category, message) {
     const dateLog = new Date().toISOString();
     const appenders = config.appenders;
 
-    for (let i = 0; i < appenders.length; i++) {
-      const appender = appenderStrategy.getAppender(appenders[i]);
-      appender.log(dateLog, level, category, message);
-    }
+    appenders.forEach((appender) => {
+      const listener = appenderStrategy.getAppender(appender).log;
+      eventEmitter.once('log', listener);
+    });
+
+    eventEmitter.emit('log', dateLog, level, category, message);
   }
 }
 
