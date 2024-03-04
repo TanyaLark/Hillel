@@ -3,6 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import config from '../config/config.js';
 import { formatMessage } from '../formatters/format-default-txt.js';
+import { Writable } from 'stream';
 
 const extension = config.formatter?.toLowerCase();
 const directory = constants.directory;
@@ -21,20 +22,25 @@ function log(formatter) {
 
     if (level === constants.level.ERROR) {
       const errLogMessage = formatMessage(date, level, category, message);
-      writeLog(errorLogFilePath, errLogMessage);
+      writeToStream(errorLogFilePath, errLogMessage);
     }
-
-    writeLog(filePath, logMessage);
+    writeToStream(filePath, logMessage);
   };
 }
 
-function writeLog(filePath, message) {
-  fs.writeFile(filePath, message, { flag: 'a+' }, (err) => {
-    if (err) {
-      console.error('Error writing log file:', err);
-      return;
-    }
+function writeToStream(filePath, message) {
+  const stream = fs.createWriteStream(filePath, { flags: 'a+' });
+  const writableStream = new Writable({
+    write(chunk, encoding, callback) {
+      if (!stream.write(chunk)) {
+        stream.once('drain', callback);
+      } else {
+        callback();
+      }
+    },
   });
+  writableStream.write(message);
+  writableStream.end();
 }
 
 function getFormattedDateForCSVFileName(dateString) {
