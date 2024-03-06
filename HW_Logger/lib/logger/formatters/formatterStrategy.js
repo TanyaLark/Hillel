@@ -1,7 +1,7 @@
 import * as constants from '../constants.js';
-import { formatMessage as formatMessageTXT } from './format-default-txt.js';
-import { formatMessage as formatMessageJSON } from './format-json.js';
-import { formatMessage as formatMessageCSV } from './format-csv.js';
+import { transform as formatMessageTXT } from './format-default-txt.js';
+import { transform as formatMessageJSON } from './format-json.js';
+import { transform as formatMessageCSV } from './format-csv.js';
 
 const formatters = {
   [constants.formatters.TEXT]: formatMessageTXT,

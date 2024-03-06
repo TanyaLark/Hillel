@@ -1,52 +1,28 @@
-import { Writable } from 'stream';
-import transform from './helpers/fileHelper.js';
+import { Readable } from 'stream';
+import fileHelper from './helpers/fileHelper.js';
 
 function log(formatter) {
-  return function (date, level, category, message, filename) {
-    const formattedMessage = formatter(
-      date,
-      level,
-      category,
-      message,
-      filename
-    );
-    process.stdout.write(formattedMessage + '\n');
+  return function (date, level, category, message) {
+    const logData = `${JSON.stringify({ date, level, category, message })}`;
+    const inputStream = new Readable({
+      read() {
+        this.push(logData);
+        this.push(null);
+      },
+    });
+
+    inputStream
+      .pipe(formatter(fileHelper.processFilename))
+      .pipe(process.stdout);
+
+    inputStream.on('error', (err) => {
+      console.error('readable error:', err);
+    });
   };
 }
 
 function init(formatter) {
-  const logger = new Writable({
-    write(chunk, encoding, callback) {
-      process.stdout.write(chunk);
-      callback();
-    },
-  });
-
-  const logWithFilename = (date, level, category, message) => {
-    const payload = transform.transformPayload(
-      date,
-      level,
-      category,
-      message,
-      transform.processFilename
-    );
-    log(formatter)(
-      payload.date,
-      payload.level,
-      payload.category,
-      payload.message,
-      payload.filename
-    );
-  };
-
-  process.on('exit', () => {
-    logger.end();
-  });
-
-  return {
-    log: logWithFilename,
-    stream: logger,
-  };
+  return { log: log(formatter) };
 }
 
 export default init;
