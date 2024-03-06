@@ -10,7 +10,11 @@ const appenders = {
   [undefined]: consoleAppender,
 };
 function getAppender(appender) {
-  const outputFormat = formatterStrategy.getFormatter(config.formatter);
+  let formatter = config.formatter;
+  if(appender === constants.appender.CONSOLE){
+    formatter = constants.formatters.TEXT;
+  }
+  const outputFormat = formatterStrategy.getFormatter(formatter);
   return appenders[appender](outputFormat);
 }
 
