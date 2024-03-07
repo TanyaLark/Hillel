@@ -3,10 +3,12 @@ import config from '../config/config.js';
 import * as formatterStrategy from '../formatters/formatterStrategy.js';
 import consoleAppender from './console.js';
 import fileAppender from './file.js';
+import networkAppender from './network.js';
 
 const appenders = {
   [constants.appender.CONSOLE]: consoleAppender,
   [constants.appender.FILE]: fileAppender,
+  [constants.appender.NETWORK]: networkAppender,
   [undefined]: consoleAppender,
 };
 function getAppender(appender) {
