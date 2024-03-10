@@ -1,28 +1,10 @@
-import { Readable } from 'stream';
-import fileHelper from './helpers/fileHelper.js';
-
-function log(formatter) {
-  return function (date, level, category, message) {
-    const logData = `${JSON.stringify({ date, level, category, message })}`;
-    const inputStream = new Readable({
-      read() {
-        this.push(logData);
-        this.push(null);
-      },
-    });
-
-    inputStream
-      .pipe(formatter(fileHelper.processFilename))
-      .pipe(process.stdout);
-
-    inputStream.on('error', (err) => {
-      console.error('readable error:', err);
-    });
-  };
-}
+import { getTransformStream } from '../providers/streams-provider.js';
+import helper from '../appenders/helpers/fileHelper.js';
 
 function init(formatter) {
-  return { log: log(formatter) };
+  const transformStream = getTransformStream();
+  transformStream.pipe(formatter(helper.processFilename)).pipe(process.stdout);
+  return { log: () => {} };
 }
 
 export default init;

@@ -1,49 +1,44 @@
 import * as constants from '../constants.js';
 import fs from 'fs';
 import config from '../config/config.js';
-import { Readable } from 'stream';
+import { Transform } from 'stream';
 import fileHelper from './helpers/fileHelper.js';
+import { getTransformStream } from '../providers/streams-provider.js';
 
 const extension = config.formatter?.toLowerCase();
 const directory = constants.directory;
 const errorLogFileName = constants.errorLogFileName;
 
-const log = (formatter) => (date, level, category, message) => {
-  const logData = `${JSON.stringify({ date, level, category, message })}`;
-  const fileName = fileHelper.getFileName(date, extension);
+function init(formatter) {
+  const fileName = fileHelper.getFileName(extension);
   const filePath = fileHelper.getFilePath(directory, fileName);
   const errorLogFilePath = fileHelper.getFilePath(directory, errorLogFileName);
-  const inputStream = new Readable({
-    read() {
-      this.push(logData);
-      this.push(null);
-    },
-  });
-
-  inputStream
+  const transformStream = getTransformStream();
+  transformStream
     .pipe(formatter(fileHelper.processFilename))
     .pipe(fs.createWriteStream(filePath, { flags: 'a+' }));
-
-  inputStream.on('error', (err) => {
-    console.error('readable error:', err);
-  });
-
-  inputStream.on('end', () => {});
 
   if (!fs.existsSync(constants.directory)) {
     fs.mkdirSync(constants.directory, { recursive: true });
   }
 
-  if (level === constants.level.ERROR) {
-    const writeStream = fs.createWriteStream(errorLogFilePath, {
-      flags: 'a+',
-    });
-    inputStream.pipe(writeStream);
-  }
-};
+  transformStream
+    .pipe(
+      new Transform({
+        transform(chunk, encoding, callback) {
+          const parsedChunk = JSON.parse(chunk);
+          if (parsedChunk.level === constants.level.ERROR) {
+            callback(null, chunk);
+          } else {
+            callback();
+          }
+        },
+      })
+    )
+    .pipe(formatter(fileHelper.processFilename))
+    .pipe(fs.createWriteStream(errorLogFilePath, { flags: 'a+' }));
 
-function init(formatter) {
-  return { log: log(formatter) };
+  return { log: () => {} };
 }
 
 export default init;

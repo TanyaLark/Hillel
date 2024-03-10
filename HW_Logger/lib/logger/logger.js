@@ -2,8 +2,15 @@ import config from './config/config.js';
 import { scoreLevel, level } from './constants.js';
 import * as appenderStrategy from './appenders/appenderStrategy.js';
 import { EventEmitter } from 'events';
+import { getTransformStream } from './providers/streams-provider.js';
 
-export const eventEmitter = new EventEmitter();
+const eventEmitter = new EventEmitter();
+const appenders = config.appenders;
+
+appenders.forEach((appender) => {
+  const listener = appenderStrategy.getAppender(appender).log;
+  eventEmitter.on('log', listener);
+});
 
 const logger = (category) => ({
   info: (...message) => {
@@ -24,15 +31,12 @@ const logger = (category) => ({
 });
 
 function executeLog(level, category, message) {
+  const transformStream = getTransformStream();
   if (scoreLevel[level] <= config.scoreLevel) {
     const dateLog = new Date().toISOString();
-    const appenders = config.appenders;
-
-    appenders.forEach((appender) => {
-      const listener = appenderStrategy.getAppender(appender).log;
-      eventEmitter.once('log', listener);
-    });
-
+    transformStream.write(
+      JSON.stringify({ date: dateLog, level, category, message })
+    );
     eventEmitter.emit('log', dateLog, level, category, message);
   }
 }

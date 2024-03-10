@@ -15,7 +15,8 @@ function getFormattedDateForCSVFileName(dateString) {
   return `${month}_${day}_${year}`;
 }
 
-function getFileName(date, formatter) {
+function getFileName(formatter) {
+  const date = new Date().toISOString();
   const fileFormat = formatter.toLowerCase();
   if (fileFormat === constants.formatters.CSV) {
     return `app_${getFormattedDateForCSVFileName(date)}.csv`;
