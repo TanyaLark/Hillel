@@ -17,6 +17,7 @@ const scoreLevel = {
 const appender = {
   CONSOLE: 'CONSOLE',
   FILE: 'FILE',
+  NETWORK: 'NETWORK',
 };
 
 const formatters = {
@@ -26,7 +27,20 @@ const formatters = {
   LOG: 'LOG',
 };
 
+const defaultNetworkConfig = {
+  PORT: 3000,
+  HOST: 'localhost',
+};
+
 const directory = `./log_output`;
 const errorLogFileName = `app_error.js`;
 
-export { level, scoreLevel, appender, formatters, directory, errorLogFileName };
+export {
+  level,
+  scoreLevel,
+  appender,
+  formatters,
+  directory,
+  errorLogFileName,
+  defaultNetworkConfig,
+};

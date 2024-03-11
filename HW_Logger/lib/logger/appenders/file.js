@@ -1,74 +1,44 @@
 import * as constants from '../constants.js';
-import * as formatterStrategy from '../formatters/formatterStrategy.js';
 import fs from 'fs';
-import path from 'path';
 import config from '../config/config.js';
-import setTextMessage from '../formatters/format-default-txt.js';
+import { Transform } from 'stream';
+import fileHelper from './helpers/fileHelper.js';
+import { getTransformStream } from '../providers/streams-provider.js';
 
-const formatterFromStrategy = formatterStrategy.getFormatter();
+const extension = config.formatter?.toLowerCase();
+const directory = constants.directory;
+const errorLogFileName = constants.errorLogFileName;
 
-function getFileName(config) {
-  const fileFormat = config.formatter.toLowerCase();
-
-  if (config.formatter === constants.formatters.CSV) {
-    const currentDate = new Date();
-    const formattedDate = `${currentDate.getDate()}_${
-      currentDate.getMonth() + 1
-    }_${currentDate.getFullYear()}`;
-    return `app.${formattedDate}.csv`;
-  }
-  return `app.${fileFormat}`;
-}
-
-export function getFilePath(config) {
-  const fileName = getFileName(config);
-  return path.join(constants.directory, fileName);
-}
-
-function log(date, level, category, message) {
-  const filePath = getFilePath(config);
-
-  const logMessage = formatterFromStrategy.formatMessage(
-    date,
-    level,
-    category,
-    message
-  );
+function init(formatter) {
+  const fileName = fileHelper.getFileName(extension);
+  const filePath = fileHelper.getFilePath(directory, fileName);
+  const errorLogFilePath = fileHelper.getFilePath(directory, errorLogFileName);
+  const transformStream = getTransformStream();
+  transformStream
+    .pipe(formatter(fileHelper.processFilename))
+    .pipe(fs.createWriteStream(filePath, { flags: 'a+' }));
 
   if (!fs.existsSync(constants.directory)) {
     fs.mkdirSync(constants.directory, { recursive: true });
   }
 
-  if (level === constants.level.ERROR) {
-    const errLogMessage = setTextMessage.formatMessage(
-      date,
-      level,
-      category,
-      message
-    );
-    logError(errLogMessage);
-  }
+  transformStream
+    .pipe(
+      new Transform({
+        transform(chunk, encoding, callback) {
+          const parsedChunk = JSON.parse(chunk);
+          if (parsedChunk.level === constants.level.ERROR) {
+            callback(null, chunk);
+          } else {
+            callback();
+          }
+        },
+      })
+    )
+    .pipe(formatter(fileHelper.processFilename))
+    .pipe(fs.createWriteStream(errorLogFilePath, { flags: 'a+' }));
 
-  fs.writeFile(filePath, logMessage, { flag: 'a+' }, (err) => {
-    if (err) {
-      console.error('Error writing log file:', err);
-      return;
-    }
-  });
+  return { log: () => {} };
 }
 
-function logError(logMessage) {
-  const errorLogFilePath = path.join(
-    constants.directory,
-    constants.errorLogFileName
-  );
-
-  fs.writeFile(errorLogFilePath, logMessage, { flag: 'a+' }, (err) => {
-    if (err) {
-      console.error('Error writing log file:', err);
-      return;
-    }
-  });
-}
-
-export default { log };
+export default init;

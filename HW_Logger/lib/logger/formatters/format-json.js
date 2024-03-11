@@ -1,7 +1,13 @@
-function formatMessage(date, level, category, message) {
-  return `{ "Date": "${date}", "category":"${category}", "level":"${level}", "message":${JSON.stringify(
-    message
-  )}}\n`;
-}
+import { Transform } from 'stream';
 
-export default { formatMessage };
+export function transform(newValue) {
+  return new Transform({
+    objectMode: true,
+    transform(chunk, encoding, callback) {
+      const dataObj = JSON.parse(chunk.toString());
+      dataObj.processFilename = newValue;
+      const modifiedChunk = JSON.stringify(dataObj) + '\n';
+      callback(null, modifiedChunk);
+    },
+  });
+}

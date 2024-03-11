@@ -1,7 +1,10 @@
-import messageHelper from '../formatters/format-default-txt.js';
+import { getTransformStream } from '../providers/streams-provider.js';
+import helper from '../appenders/helpers/fileHelper.js';
 
-function log(date, level, category, message) {
-  console.log(messageHelper.formatMessage(date, level, category, message));
+function init(formatter) {
+  const transformStream = getTransformStream();
+  transformStream.pipe(formatter(helper.processFilename)).pipe(process.stdout);
+  return { log: () => {} };
 }
 
-export default { log };
+export default init;

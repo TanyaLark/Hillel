@@ -26,9 +26,38 @@ export function getConfigFromFile(filePath) {
       }
     }
 
-    if (config.appenders && config.appenders.includes('FILE')) {
+    if (
+      config.appenders &&
+      config.appenders.includes(constants.appender.FILE)
+    ) {
       config.formatter =
         constants.formatters[logFormat] || constants.formatters.TEXT;
+    }
+
+    if (
+      config.appenders &&
+      config.appenders.includes(constants.appender.NETWORK)
+    ) {
+      //todo: validate port and host
+      const port = file.appenderPort;
+      console.log('port:', port);
+      const host = file.appenderHost?.toLowerCase();
+
+      if (!port) {
+        console.warn('No appender port provided');
+        console.warn('Using default port:', constants.defaultNetworkConfig.PORT);
+        config.appenderPort = constants.defaultNetworkConfig.PORT;
+      } else {
+        config.appenderPort = port;
+      }
+
+      if (!host) {
+        console.warn('No appender host provided');
+        console.warn('Using default host:', constants.defaultNetworkConfig.HOST);
+        config.appenderHost = constants.defaultNetworkConfig.HOST;
+      } else {
+        config.appenderHost = host;
+      }
     }
   } catch (error) {
     console.warn('Error reading config file ', error.message);
