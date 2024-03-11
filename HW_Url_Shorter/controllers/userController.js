@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import UserService from '../service/UserService.js';
+import UserService from '../services/UserService.js';
 
 export default class UserController extends Router {
   constructor() {

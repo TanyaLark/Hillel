@@ -2,9 +2,7 @@ const map = new Map();
 
 export default class UrlRepository {
   save(url) {
-    console.log(url);
     map.set(url.urlId, url);
-    console.log(map.get(url.urlId));
   }
 
   get(urlId) {
@@ -13,5 +11,14 @@ export default class UrlRepository {
 
   getAll() {
     return map.values();
+  }
+
+  getUrlByCode(code) {
+    return Array.from(map.values()).find((url) => url.code === code);
+  }
+
+  incrementVisits(url) {
+    url.visits++;
+    map.set(url.urlId, url);
   }
 }

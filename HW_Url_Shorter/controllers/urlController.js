@@ -1,5 +1,5 @@
 import Router from 'express';
-import UrlService from '../service/UrlService.js';
+import UrlService from '../services/UrlService.js';
 
 export default class UrlController extends Router {
   constructor() {

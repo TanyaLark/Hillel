@@ -10,7 +10,7 @@ export default class UrlService {
     this.urlRepository = new UrlRepository();
   }
 
-  create(name, originalUrl, userId, visits = 0,) {
+  create(name, originalUrl, userId, visits = 0) {
     const url = new UrlModel(
       generate(sequenceName).toString(),
       generateHash(),
@@ -27,6 +27,20 @@ export default class UrlService {
   }
 
   getUrls() {
-    return this.urlRepository.getAll();
+    const urls = this.urlRepository.getAll();
+
+    const result = [];
+    for (const url of urls) {
+      result.push({
+        id: url.urlId,
+        code: url.code,
+        name: url.name,
+        url: url.url,
+        visits: url.visits,
+        userId: url.userId,
+      });
+    }
+
+    return result;
   }
 }
