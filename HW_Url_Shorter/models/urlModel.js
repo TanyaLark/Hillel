@@ -1,4 +1,4 @@
-export class UrlModel {
+export default class UrlModel {
   urlId;
   code;
   name;
