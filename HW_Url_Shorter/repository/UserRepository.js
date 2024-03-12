@@ -12,4 +12,13 @@ export default class UserRepository {
   getAll() {
     return map.values();
   }
+
+  getByNameAndPassword(name, password) {
+    for (const user of map.values()) {
+      if (user.name === name && user.password === password) {
+        return user;
+      }
+    }
+    return null;
+  }
 }

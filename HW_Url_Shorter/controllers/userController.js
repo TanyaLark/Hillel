@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import UserService from '../services/UserService.js';
+import authMiddleware from '../middlewares/authMiddleware.js';
+import error from '../utils/customErrors.js';
 
 export default class UserController extends Router {
   constructor() {
@@ -10,18 +12,21 @@ export default class UserController extends Router {
   }
 
   init = () => {
-    this.get('/id/:id', (req, res) => {
+    this.get('/id/:id', authMiddleware, (req, res) => {
       const user = this.userService.getUserPublicData(req.params.id);
       res.json(user);
     });
 
-    this.get('/all', (req, res) => {
+    this.get('/all', authMiddleware, (req, res) => {
       const users = this.userService.getUsersPublicData();
       res.json(users);
     });
 
     this.post('/create', (req, res) => {
       const { name, password } = req.body;
+      if (!name || !password) {
+        throw new error.ValidationError('Name and password are required');
+      }
       this.userService.create(name, password);
 
       res.send('Saved!');
