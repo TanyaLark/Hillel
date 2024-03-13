@@ -1,10 +1,24 @@
 import express from 'express';
+import path from 'path';
 import UserController from './controllers/userController.js';
 import UrlController from './controllers/urlController.js';
 import CodeController from './controllers/codeController.js';
 import authMiddleware from './middlewares/authMiddleware.js';
+import nunjucks from 'nunjucks';
 
 const app = express();
+
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, 'public')));
+nunjucks.configure(path.join(__dirname, 'public'), {
+  autoescape: true,
+  express: app,
+  noCache: true,
+});
+
+app.get('/', (req, res) => {
+  res.render('index.html');
+});
 
 app.use(express.json());
 app.use('/user', new UserController());
