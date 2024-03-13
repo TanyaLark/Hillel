@@ -12,8 +12,8 @@ export default class CodeController extends Router {
   init = () => {
     this.get('/:code', (req, res) => {
       try {
-        const url = this.codeService.getUrlByCode(req.params.code);
-        res.redirect(302, url.url);
+        const visit = this.codeService.visit(req.params.code);
+        res.redirect(302, visit.url);
       } catch (error) {
         res.status(404).json({ status: 'error', message: error.message });
       }
