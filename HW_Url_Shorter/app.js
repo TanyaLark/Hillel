@@ -5,6 +5,7 @@ import UrlController from './controllers/urlController.js';
 import CodeController from './controllers/codeController.js';
 import authMiddleware from './middlewares/authMiddleware.js';
 import nunjucks from 'nunjucks';
+import cookieParser from 'cookie-parser';
 
 const app = express();
 
@@ -15,9 +16,19 @@ nunjucks.configure(path.join(__dirname, 'public'), {
   express: app,
   noCache: true,
 });
+app.use(cookieParser());
 
 app.get('/', (req, res) => {
-  res.render('index.html');
+  res.render('index.njk');
+});
+
+app.get('/login', (req, res) => {
+  res.render('login.html');
+});
+
+app.get('/logout', (req, res) => {
+  res.clearCookie('authorization');
+  res.redirect('/login');
 });
 
 app.use(express.json());

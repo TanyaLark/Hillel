@@ -1,6 +1,5 @@
-import Router from 'express';
+import { Router } from 'express';
 import UrlService from '../services/UrlService.js';
-
 export default class UrlController extends Router {
   constructor() {
     super();
@@ -17,12 +16,15 @@ export default class UrlController extends Router {
 
     this.get('/all', (req, res) => {
       const urls = this.urlService.getUrls();
-      res.json(urls);
+      console.log(urls);
+      res.render('urlShorter.njk', { urls });
+      // res.json(urls);
     });
 
     this.post('/create', (req, res) => {
-      const { url, name, userId } = req.body;
-      this.urlService.create(url, name, userId);
+      const userId = req.userId;
+      const { originalUrl, name } = req.body;
+      this.urlService.create(originalUrl, name,  userId);
 
       res.send('Saved!');
     });

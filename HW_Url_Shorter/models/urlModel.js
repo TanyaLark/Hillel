@@ -7,7 +7,7 @@ export default class UrlModel {
   created_time;
   userId;
 
-  constructor(urlId, code, name, url, visits, userId) {
+  constructor(urlId, code, url, name, visits, userId) {
     this.urlId = urlId;
     this.code = code;
     this.name = name;
