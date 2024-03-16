@@ -33,9 +33,10 @@ app.get('/logout', (req, res) => {
 
 app.use(express.json());
 app.use('/user', new UserController());
+app.use('/code', new CodeController());
 app.use(authMiddleware);
 app.use('/url', new UrlController());
-app.use('/code', new CodeController());
+
 
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError') {

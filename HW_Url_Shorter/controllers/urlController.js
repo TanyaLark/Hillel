@@ -17,13 +17,12 @@ export default class UrlController extends Router {
     this.get('/all', (req, res) => {
       const urls = this.urlService.getUrls();
       res.render('urlShorter.njk', { urls });
-      // res.json(urls);
     });
 
     this.post('/create', (req, res) => {
       const userId = req.userId;
       const { originalUrl, name } = req.body;
-      this.urlService.create(originalUrl, name,  userId);
+      this.urlService.create(originalUrl, name, userId);
 
       res.send('Saved!');
     });

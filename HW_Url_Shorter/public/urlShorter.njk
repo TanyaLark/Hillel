@@ -82,7 +82,9 @@
               <h2 class="mt-5">List of existing url</h2>
               <ul class="container text-center list-group mt-3">
                 {% for url in urls %}
-                <li class="list-group-item">{{ url.url }}</li>
+                <li class="list-group-item">
+                  Original url: "{{ url.url }}" <br /> Short url: "{{ url.shortLink }}"
+                </li>
                 {% endfor %}
               </ul>
             </form>

@@ -38,6 +38,7 @@ export default class UrlService {
         url: url.url,
         visits: url.visits,
         userId: url.userId,
+        shortLink: url.shortLink,
       });
     }
 
