@@ -16,7 +16,6 @@ export default class UrlController extends Router {
 
     this.get('/all', (req, res) => {
       const urls = this.urlService.getUrls();
-      console.log(urls);
       res.render('urlShorter.njk', { urls });
       // res.json(urls);
     });
