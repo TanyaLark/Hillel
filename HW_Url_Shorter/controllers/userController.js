@@ -12,14 +12,30 @@ export default class UserController extends Router {
   }
 
   init = () => {
-    this.get('/id/:id', authMiddleware, (req, res) => {
-      const user = this.userService.getUserPublicData(req.params.id);
+    this.get('/', authMiddleware, (req, res) => {
+      const userId = req.userId;
+      const user = this.userService.getUserPublicData(userId);
       res.json(user);
     });
 
-    this.get('/all', authMiddleware, (req, res) => {
+    this.get('/all', (req, res) => {
       const users = this.userService.getUsersPublicData();
-      res.json(users);
+      res.render('listUsers.njk', { users });
+      // res.json(users);
+    });
+
+    this.post('/login', (req, res) => {
+      const { name, password } = req.body;
+      if (!name || !password) {
+        throw new error.ValidationError('Name and password are required');
+      }
+      const user = this.userService.login(name, password);
+      if (!user) {
+        res.status(401).send('Invalid user name or password');
+        return;
+      }
+      res.cookie('authorization', `${user.name}$$${password}`);
+      res.status(200).json(user);
     });
 
     this.post('/create', (req, res) => {
@@ -27,6 +43,7 @@ export default class UserController extends Router {
       if (!name || !password) {
         throw new error.ValidationError('Name and password are required');
       }
+      res.cookie('authorization', `${name}$$${password}`);
       this.userService.create(name, password);
 
       res.send('Saved!');

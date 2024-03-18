@@ -6,8 +6,9 @@ export default class UrlModel {
   visits;
   created_time;
   userId;
+  shortLink;
 
-  constructor(urlId, code, name, url, visits, userId) {
+  constructor(urlId, code, url, name, visits, userId) {
     this.urlId = urlId;
     this.code = code;
     this.name = name;
@@ -15,5 +16,6 @@ export default class UrlModel {
     this.visits = visits;
     this.created_time = new Date();
     this.userId = userId;
+    this.shortLink = `http://localhost:3000/code/${code}`;
   }
 }

@@ -10,7 +10,7 @@ export default class UrlService {
     this.urlRepository = new UrlRepository();
   }
 
-  create(name, originalUrl, userId, visits = 0) {
+  create(originalUrl, name,  userId, visits = 0) {
     const url = new UrlModel(
       generate(sequenceName).toString(),
       generateHash(),
@@ -38,6 +38,7 @@ export default class UrlService {
         url: url.url,
         visits: url.visits,
         userId: url.userId,
+        shortLink: url.shortLink,
       });
     }
 

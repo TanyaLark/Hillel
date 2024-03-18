@@ -18,6 +18,18 @@ export default class UserService {
     this.userRepository.save(user);
   }
 
+  login(name, password) {
+    const user = this.userRepository.getByNameAndPassword(name, password);
+    if (!user) {
+      return null;
+    }
+    return {
+      id: user.userId,
+      name: user.name,
+      created_time: user.created_time,
+    };
+  }
+
   getUserPublicData(id) {
     const user = this.userRepository.get(id);
 

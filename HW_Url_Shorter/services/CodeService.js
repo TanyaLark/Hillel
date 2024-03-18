@@ -5,7 +5,7 @@ export default class CodeService {
     this.urlRepository = new UrlRepository();
   }
 
-  getUrlByCode(code) {
+  visit(code) {
     const url = this.urlRepository.getUrlByCode(code);
     if (!url) {
       throw new Error('URL not found');
