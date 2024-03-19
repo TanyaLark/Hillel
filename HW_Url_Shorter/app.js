@@ -37,7 +37,6 @@ app.use('/code', new CodeController());
 app.use(authMiddleware);
 app.use('/url', new UrlController());
 
-
 app.use((err, req, res, next) => {
   if (err.name === 'ValidationError') {
     res.status(err.statusCode).send(err.message);
