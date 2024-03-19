@@ -25,11 +25,11 @@ export function rateLimit(config) {
       const reqCount = await redisClient.hGet(key, 'reqCount');
       const resetTime = await redisClient.hGet(key, 'resetTime');
 
-      if (parseInt(reqCount) > reqLimit && now < parseInt(resetTime)) {
+      if (reqCount > reqLimit && now < resetTime) {
         return res.status(429).json({ error: 'Rate limit exceeded' });
       }
 
-      if (now > parseInt(resetTime)) {
+      if (now > resetTime) {
         await redisClient.hSet(key, {
           reqCount: 1,
           resetTime: now + windowMs,
