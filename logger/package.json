@@ -1,8 +1,8 @@
 {
-  "name": "hw_2",
+  "name": "logger",
   "version": "1.0.0",
   "description": "Logger",
-  "main": "app.js",
+  "main": "index.js",
   "scripts": {
     "start": "node app.js"
   },
