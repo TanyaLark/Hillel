@@ -1,47 +1,40 @@
-import UrlRepository from '../repository/UrlRepository.js';
 import UrlModel from '../models/urlModel.js';
-import { generate } from '../utils/storageGenerators.js';
+import UrlRepository from '../repository/UrlRepository.js';
 import { generateHash } from '../utils/hashGenerator.js';
+import logger from 'logger';
 
-const sequenceName = 'urlId';
+const log = logger.getLogger('UserService.js');
 
 export default class UrlService {
   constructor() {
     this.urlRepository = new UrlRepository();
   }
 
-  create(originalUrl, name,  userId, visits = 0) {
+  async create(originalUrl, name, userId, visits = 0) {
+    const code = generateHash();
+    const shortLink = `http://localhost:3000/code/${code}`;
     const url = new UrlModel(
-      generate(sequenceName).toString(),
-      generateHash(),
-      originalUrl,
+      code,
       name,
+      originalUrl,
       visits,
+      shortLink,
       userId
     );
-    this.urlRepository.save(url);
+    await this.urlRepository.save(url);
   }
 
-  getUrl(id) {
-    return this.urlRepository.get(id);
+  async getUrl(id) {
+    return await this.urlRepository.get(id);
   }
 
-  getUrls() {
-    const urls = this.urlRepository.getAll();
-
-    const result = [];
-    for (const url of urls) {
-      result.push({
-        id: url.urlId,
-        code: url.code,
-        name: url.name,
-        url: url.url,
-        visits: url.visits,
-        userId: url.userId,
-        shortLink: url.shortLink,
-      });
+  async getUrls(userId) {
+    try {
+      const urls = await this.urlRepository.getAll(userId);
+      return urls.rows;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      return null;
     }
-
-    return result;
   }
 }

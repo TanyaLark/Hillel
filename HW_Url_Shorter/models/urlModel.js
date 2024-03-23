@@ -1,21 +1,17 @@
 export default class UrlModel {
-  urlId;
   code;
   name;
-  url;
+  originalUrl;
   visits;
-  created_time;
-  userId;
   shortLink;
+  userId;
 
-  constructor(urlId, code, url, name, visits, userId) {
-    this.urlId = urlId;
+  constructor(code, name, originalUrl, visits, shortLink, userId) {
     this.code = code;
     this.name = name;
-    this.url = url;
+    this.originalUrl = originalUrl;
     this.visits = visits;
-    this.created_time = new Date();
+    this.shortLink = shortLink;
     this.userId = userId;
-    this.shortLink = `http://localhost:3000/code/${code}`;
   }
 }
