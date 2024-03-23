@@ -135,7 +135,12 @@
             if (response.ok) {
               window.location.replace('/url/all');
             }
+
+            if (response.status === 401) {
+              alert('User already exists');
+            }
           } catch (error) {
+            alert('Error creating user:', error.message);
             console.error('Error creating user:', error);
           }
         });

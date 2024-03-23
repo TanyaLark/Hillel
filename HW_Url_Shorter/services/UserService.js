@@ -1,56 +1,68 @@
 import UserRepository from '../repository/UserRepository.js';
 import UserModel from '../models/userModel.js';
-import { generate } from '../utils/storageGenerators.js';
+import logger from 'logger';
 
-const sequenceName = 'user';
+const log = logger.getLogger('UserService.js');
 
 export default class UserService {
   constructor() {
     this.userRepository = new UserRepository();
   }
 
-  create(name, password) {
-    const user = new UserModel(
-      generate(sequenceName).toString(),
-      name,
-      password
-    );
-    this.userRepository.save(user);
+  async create(name, password) {
+    try {
+      const user = new UserModel(name, password);
+      await this.userRepository.save(user);
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      throw error;
+    }
   }
 
-  login(name, password) {
-    const user = this.userRepository.getByNameAndPassword(name, password);
-    if (!user) {
+  async login(name, password) {
+    try {
+      const user = await this.userRepository.getByName(name, password);
+      if (user.password !== password.toString()) {
+        log.error('Invalid user name or password');
+        return null;
+      }
+      return {
+        id: user.id,
+        name: user.name,
+        created_time: user.created_time,
+      };
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
       return null;
     }
+  }
+
+  async getUserPublicData(id) {
+    const user = await this.userRepository.get(id);
+
     return {
-      id: user.userId,
+      id: user.id,
       name: user.name,
       created_time: user.created_time,
     };
   }
 
-  getUserPublicData(id) {
-    const user = this.userRepository.get(id);
-
-    return {
-      id: user.userId,
-      name: user.name,
-      created_time: user.created_time,
-    };
-  }
-
-  getUsersPublicData() {
-    const users = this.userRepository.getAll();
+  async getUsersPublicData() {
+    const users = await this.userRepository.getAll();
     const result = [];
 
     for (const user of users) {
       result.push({
-        id: user.userId,
+        id: user.id,
         name: user.name,
       });
     }
 
     return result;
+  }
+
+  async getByName(name) {
+    const user = await this.userRepository.getByName(name);
+    return user;
   }
 }
