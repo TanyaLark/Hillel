@@ -76,7 +76,7 @@ function initConfig() {
   );
 
   enrichConfig(config);
-  console.log('config ===>', config);
+  // console.log('config ===>', config);
   return config;
 }
 

@@ -1,5 +1,5 @@
 import { getTransformStream } from '../providers/streams-provider.js';
-import helper from '../appenders/helpers/fileHelper.js';
+import helper from './helpers/fileHelper.js';
 
 function init(formatter) {
   const transformStream = getTransformStream();

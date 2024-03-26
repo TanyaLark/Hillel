@@ -1,24 +1,27 @@
-const map = new Map();
+import { client } from '../config/db/postgresql.js';
 
 export default class UserRepository {
-  save(user) {
-    map.set(user.userId, user);
+  async save(user) {
+    const newUser = await client.query(
+      'INSERT INTO users (name, password) VALUES ($1, $2) RETURNING *',
+      [user.name, user.password]
+    );
+    return newUser;
   }
 
-  get(userId) {
-    return map.get(userId);
+  async get(userId) {
+    return await client.query('SELECT * FROM users WHERE id = $1', [userId]);
   }
 
-  getAll() {
-    return map.values();
+  async getAll() {
+    const users = await client.query('SELECT * FROM users');
+    return users.rows;
   }
 
-  getByNameAndPassword(name, password) {
-    for (const user of map.values()) {
-      if (user.name === name && user.password === password) {
-        return user;
-      }
-    }
-    return null;
+  async getByName(name) {
+    const user = await client.query('SELECT * FROM users WHERE name = $1', [
+      name,
+    ]);
+    return user.rows[0];
   }
 }

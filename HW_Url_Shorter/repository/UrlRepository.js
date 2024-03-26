@@ -1,24 +1,44 @@
-const map = new Map();
+import { client } from '../config/db/postgresql.js';
 
 export default class UrlRepository {
-  save(url) {
-    map.set(url.urlId, url);
+  async save(url) {
+    try {
+      const newUrl = await client.query(
+        'INSERT INTO urls (code, name, original_url, visits, short_link, user_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+        [
+          url.code,
+          url.name,
+          url.originalUrl,
+          url.visits,
+          url.shortLink,
+          url.userId,
+        ]
+      );
+      return newUrl;
+    } catch (error) {
+      throw new Error(`Error: ${error.message}`);
+    }
   }
 
-  get(urlId) {
-    return map.get(urlId);
+  async get(urlId) {
+    return await client.query('SELECT * FROM urls WHERE id = $1', [urlId]);
   }
 
-  getAll() {
-    return map.values();
+  async getAll( userId) {
+    return await client.query('SELECT * FROM urls WHERE user_id = $1', [userId]);
   }
 
-  getUrlByCode(code) {
-    return Array.from(map.values()).find((url) => url.code === code);
+  async getUrlByCode(code) {
+    const url = await client.query('SELECT * FROM urls WHERE code = $1', [
+      code,
+    ]);
+    return url.rows[0];
   }
 
-  incrementVisits(url) {
-    url.visits++;
-    map.set(url.urlId, url);
+  async incrementVisits(url) {
+    return await client.query(
+      'UPDATE urls SET visits = visits + 1 WHERE id = $1',
+      [url.id]
+    );
   }
 }
