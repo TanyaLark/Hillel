@@ -1,4 +1,4 @@
-import UrlRepository from '../repository/UrlRepository.js';
+import UrlRepository from '../repository/UrlRepositoryKnex.js';
 
 const urlRepository = new UrlRepository();
 

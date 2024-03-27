@@ -51,12 +51,7 @@ export default class UserController extends Router {
         if (createdUser) {
           return res.status(401).send('User already exists');
         }
-      } catch (error) {
-        log.error(`Error: ${error.message}`);
-        res.status(500).send('Something broke!');
-      }
 
-      try {
         const newUser = await this.userService.create(name, password);
         res.cookie('authorization', `${name}$$${password}`);
         res.send('Saved!');
