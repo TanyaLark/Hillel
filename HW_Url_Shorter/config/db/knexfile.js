@@ -8,9 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, '..', '..', '.env') });
 
-console.log('directory ==> ', path.join(__dirname, '..', '..', 'migrations'));
-
-const client = knex({
+const knexConfig = {
   client: 'pg',
   connection: {
     host: process.env.POSTGRES_HOST,
@@ -24,8 +22,10 @@ const client = knex({
     tableName: 'knex_migrations',
   },
   debug: true,
-});
+}
+
+const client = knex(knexConfig);
 
 Model.knex(client);
 
-export default client;
+export default knexConfig;
