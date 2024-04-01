@@ -1,8 +1,6 @@
 import { Model } from 'objection';
-import client from '../config/db/knexfile.js';
 import UserModel from './userModel.js';
 
-Model.knex(client);
 
 export default class UrlModel extends Model {
   static get tableName() {
