@@ -7,7 +7,7 @@ export function up(knex) {
     table.increments('id').primary();
     table.string('name').unique().notNullable();
     table.string('password').unique().notNullable();
-    table.timestamp('created_at', { useTz: false });
+    table.timestamp('created_at', { useTz: false }).defaultTo(knex.fn.now());
   });
 }
 

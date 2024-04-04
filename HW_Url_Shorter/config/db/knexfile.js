@@ -22,9 +22,9 @@ const knexConfig = {
     tableName: 'knex_migrations',
   },
   debug: true,
-}
+};
 
-const client = knex(knexConfig);
+export const client = knex(knexConfig);
 
 Model.knex(client);
 

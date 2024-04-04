@@ -9,7 +9,7 @@ export default class UrlService {
     this.urlRepository = new UrlRepository();
   }
 
-  async create(originalUrl, name, userId, visits = 0) {
+  async create(originalUrl, name, user_id, visits = 0) {
     const code = generateHash();
     const shortLink = `http://localhost:3000/code/${code}`;
     const url = {
@@ -18,7 +18,7 @@ export default class UrlService {
       originalUrl,
       visits,
       shortLink,
-      userId,
+      user_id,
     };
     await this.urlRepository.save(url);
   }

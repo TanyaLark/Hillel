@@ -1,5 +1,8 @@
 import { Model } from 'objection';
 import UserModel from './userModel.js';
+import { client } from '../config/db/knexfile.js';
+
+Model.knex(client);
 
 
 export default class UrlModel extends Model {
@@ -16,7 +19,7 @@ export default class UrlModel extends Model {
         'originalUrl',
         'visits',
         'shortLink',
-        'userId',
+        'user_id',
       ],
 
       properties: {
@@ -26,7 +29,7 @@ export default class UrlModel extends Model {
         originalUrl: { type: 'string', minLength: 1, maxLength: 255 },
         visits: { type: 'integer' },
         shortLink: { type: 'string', minLength: 1, maxLength: 255 },
-        userId: { type: 'integer' },
+        user_id: { type: 'integer' },
       },
     };
   }

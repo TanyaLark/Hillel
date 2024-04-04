@@ -10,7 +10,7 @@ export function up(knex) {
     table.string('originalUrl').notNullable();
     table.integer('visits').defaultTo(0);
     table.string('shortLink').notNullable();
-    table.timestamp('created_at', { useTz: false });
+    table.timestamp('created_at', { useTz: false }).defaultTo(knex.fn.now());
     table.integer('user_id').unsigned().notNullable();
     table.foreign('user_id').references('id').inTable('users');
   });
