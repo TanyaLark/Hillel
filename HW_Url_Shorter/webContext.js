@@ -3,7 +3,7 @@ import cookieParser from 'cookie-parser';
 import UserController from './controllers/userController.js';
 import UrlController from './controllers/urlController.js';
 import CodeController from './controllers/codeController.js';
-import authMiddleware from './middlewares/authMiddleware.js';
+import { authMiddleware } from './middlewares/jwtMiddleware.js';
 import path from 'path';
 import nunjucks from 'nunjucks';
 
@@ -37,7 +37,7 @@ function initPublic(app) {
   });
 
   app.get('/logout', (req, res) => {
-    res.clearCookie('authorization');
+    res.clearCookie('token');
     res.redirect('/login');
   });
 }

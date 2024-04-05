@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import UserService from '../services/UserService.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
+import { authMiddleware } from '../middlewares/jwtMiddleware.js';
 import error from '../utils/customErrors.js';
 import logger from 'logger';
 
@@ -31,12 +31,16 @@ export default class UserController extends Router {
         log.error('Name and password are required');
         throw new error.ValidationError('Name and password are required');
       }
-      const user = await this.userService.login(name, password);
-      if (!user) {
-        return res.status(401).send('Invalid user name or password');
+      try {
+        const token = await this.userService.login(name, password);
+        if (!token) {
+          return res.status(401).send('Invalid user name or password');
+        }
+        res.cookie('token', token, { httpOnly: true });
+        res.status(200).send();
+      } catch (error) {
+        res.status(500).send('Something broke!');
       }
-      res.cookie('authorization', `${user.name}$$${password}`);
-      res.status(200).json(user);
     });
 
     this.post('/create', async (req, res) => {
@@ -52,9 +56,9 @@ export default class UserController extends Router {
           return res.status(401).send('User already exists');
         }
 
-        const newUser = await this.userService.create(name, password);
-        res.cookie('authorization', `${name}$$${password}`);
-        res.send('Saved!');
+        const token = await this.userService.create(name, password);
+        res.cookie('token', token, { httpOnly: true });
+        res.status(201).send();
       } catch (error) {
         log.error(`Error: ${error.message}`);
         res.status(500).send('Something broke!');
