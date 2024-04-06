@@ -1,5 +1,8 @@
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import UserRepositoryKnex from '../repository/UserRepositoryKnex.js';
 import logger from 'logger';
+import constants from '../common/constants.js';
 
 const log = logger.getLogger('UserService.js');
 
@@ -10,7 +13,17 @@ export default class UserService {
 
   async create(name, password) {
     try {
-      await this.userRepository.save(name, password);
+      const hashedPassword = await bcrypt.hash(password, constants.SALT);
+      await this.userRepository.save(name, hashedPassword);
+
+      const user = await this.userRepository.getByName(name);
+      if (!user) {
+        log.error('User not found');
+        return null;
+      }
+
+      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, { expiresIn: '1h' });
+      return token;
     } catch (error) {
       log.error(`Error: ${error.message}`);
       throw error;
@@ -19,16 +32,20 @@ export default class UserService {
 
   async login(name, password) {
     try {
-      const user = await this.userRepository.getByName(name, password);
-      if (user.password !== password.toString()) {
-        log.error('Invalid user name or password');
+      const user = await this.userRepository.getByName(name);
+      if (!user) {
+        log.error('User not found');
         return null;
       }
-      return {
-        id: user.id,
-        name: user.name,
-        created_time: user.created_time,
-      };
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+      if (!passwordMatch) {
+        log.error('Invalid password');
+        return null;
+      }
+
+      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, { expiresIn: '1h' });
+      return token;
     } catch (error) {
       log.error(`Error: ${error.message}`);
       return null;
