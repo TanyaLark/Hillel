@@ -1,18 +1,16 @@
-import UserRepository from '../repository/UserRepository.js';
-import UserModel from '../models/userModel.js';
+import UserRepositoryKnex from '../repository/UserRepositoryKnex.js';
 import logger from 'logger';
 
 const log = logger.getLogger('UserService.js');
 
 export default class UserService {
   constructor() {
-    this.userRepository = new UserRepository();
+    this.userRepository = new UserRepositoryKnex();
   }
 
   async create(name, password) {
     try {
-      const user = new UserModel(name, password);
-      await this.userRepository.save(user);
+      await this.userRepository.save(name, password);
     } catch (error) {
       log.error(`Error: ${error.message}`);
       throw error;

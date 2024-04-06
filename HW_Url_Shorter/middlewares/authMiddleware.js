@@ -1,7 +1,7 @@
-import UserRepository from '../repository/UserRepository.js';
+import UserRepositoryKnex from '../repository/UserRepositoryKnex.js';
 import error from '../utils/customErrors.js';
 
-const userRepository = new UserRepository();
+const userRepository = new UserRepositoryKnex();
 
 export default async (req, res, next) => {
   // console.log('authMiddleware req cookies', req.cookies);

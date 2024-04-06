@@ -11,4 +11,4 @@ export  const client = new pg.Client({
   password: process.env.POSTGRES_PASSWORD,
 });
 
-await client.connect();
+// await client.connect();
