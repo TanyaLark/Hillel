@@ -26,13 +26,13 @@ export default class UserController extends Router {
     });
 
     this.post('/login', async (req, res) => {
-      const { name, password } = req.body;
-      if (!name || !password) {
+      const { email, password } = req.body;
+      if (!email || !password) {
         log.error('Name and password are required');
         throw new error.ValidationError('Name and password are required');
       }
       try {
-        const token = await this.userService.login(name, password);
+        const token = await this.userService.login(email, password);
         if (!token) {
           return res.status(401).send('Invalid user name or password');
         }
@@ -44,19 +44,18 @@ export default class UserController extends Router {
     });
 
     this.post('/create', async (req, res) => {
-      const { name, password } = req.body;
-      if (!name || !password) {
-        log.error('Name and password are required');
-        throw new error.ValidationError('Name and password are required');
+      const { name, surname, email, password } = req.body;
+      if (!name || !password || !surname || !email) {
+        return res.status(400).send('Required fields are missing');
       }
 
       try {
-        const createdUser = await this.userService.getByName(name);
+        const createdUser = await this.userService.getByEmail(email);
         if (createdUser) {
           return res.status(401).send('User already exists');
         }
 
-        const token = await this.userService.create(name, password);
+        const token = await this.userService.create(name, surname, email, password);
         res.cookie('token', token, { httpOnly: true });
         res.status(201).send();
       } catch (error) {

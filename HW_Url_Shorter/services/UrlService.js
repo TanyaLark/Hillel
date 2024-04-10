@@ -12,15 +12,21 @@ export default class UrlService {
   async create(originalUrl, name, user_id, visits = 0) {
     const code = generateHash();
     const shortLink = `http://localhost:3000/code/${code}`;
-    const url = {
+    const type = 'Permanent';
+    const isEnabled = true;
+    let expires_at = Date.now() + 1000 * 60 * 60 * 24 * 365;
+    expires_at = new Date(expires_at).toISOString();
+    await this.urlRepository.save(
       code,
       name,
       originalUrl,
       visits,
       shortLink,
-      user_id,
-    };
-    await this.urlRepository.save(url);
+      type,
+      isEnabled,
+      expires_at,
+      user_id
+    );
   }
 
   async getUrl(id) {

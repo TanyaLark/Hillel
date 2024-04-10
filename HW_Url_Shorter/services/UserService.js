@@ -11,18 +11,20 @@ export default class UserService {
     this.userRepository = new UserRepositoryKnex();
   }
 
-  async create(name, password) {
+  async create(name, surname, email, password) {
     try {
       const hashedPassword = await bcrypt.hash(password, constants.SALT);
-      await this.userRepository.save(name, hashedPassword);
+      await this.userRepository.save(name, surname, email, hashedPassword);
 
-      const user = await this.userRepository.getByName(name);
+      const user = await this.userRepository.getByEmail(email);
       if (!user) {
         log.error('User not found');
         return null;
       }
 
-      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, {
+        expiresIn: '1h',
+      });
       return token;
     } catch (error) {
       log.error(`Error: ${error.message}`);
@@ -30,9 +32,9 @@ export default class UserService {
     }
   }
 
-  async login(name, password) {
+  async login(email, password) {
     try {
-      const user = await this.userRepository.getByName(name);
+      const user = await this.userRepository.getByEmail(email);
       if (!user) {
         log.error('User not found');
         return null;
@@ -44,7 +46,9 @@ export default class UserService {
         return null;
       }
 
-      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, { expiresIn: '1h' });
+      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, {
+        expiresIn: '1h',
+      });
       return token;
     } catch (error) {
       log.error(`Error: ${error.message}`);
@@ -76,8 +80,8 @@ export default class UserService {
     return result;
   }
 
-  async getByName(name) {
-    const user = await this.userRepository.getByName(name);
+  async getByEmail(email) {
+    const user = await this.userRepository.getByEmail(email);
     return user;
   }
 }

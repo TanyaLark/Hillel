@@ -1,8 +1,33 @@
 import UrlModel from '../models/urlModel.js';
 
 export default class UrlRepository {
-  async save(url) {
-    return await UrlModel.query().insert(url);
+  async save(
+    code,
+    name,
+    originalUrl,
+    visits,
+    shortLink,
+    type,
+    isEnabled,
+    expires_at,
+    user_id
+  ) {
+    try {
+      const url = await UrlModel.query().insert({
+        code,
+        name,
+        originalUrl,
+        visits,
+        shortLink,
+        type,
+        isEnabled,
+        expires_at,
+        user_id,
+      });
+      return url;
+    } catch (error) {
+      console.log('UrlRepository error ===>', error);
+    }
   }
 
   async get(urlId) {
