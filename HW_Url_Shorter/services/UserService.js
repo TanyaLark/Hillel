@@ -35,12 +35,14 @@ export default class UserService {
   async login(email, password) {
     try {
       const user = await this.userRepository.getByEmail(email);
+
       if (!user) {
         log.error('User not found');
         return null;
       }
 
-      const passwordMatch = await bcrypt.compare(password, user.password);
+      const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+
       if (!passwordMatch) {
         log.error('Invalid password');
         return null;

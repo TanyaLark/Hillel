@@ -12,22 +12,17 @@ export default class UrlRepository {
     expires_at,
     user_id
   ) {
-    try {
-      const url = await UrlModel.query().insert({
-        code,
-        name,
-        originalUrl,
-        visits,
-        shortLink,
-        type,
-        isEnabled,
-        expires_at,
-        user_id,
-      });
-      return url;
-    } catch (error) {
-      console.log('UrlRepository error ===>', error);
-    }
+    return await UrlModel.query().insert({
+      code,
+      name,
+      originalUrl,
+      visits,
+      shortLink,
+      type,
+      isEnabled,
+      expires_at,
+      user_id,
+    });
   }
 
   async get(urlId) {

@@ -16,17 +16,23 @@ export default class UrlService {
     const isEnabled = true;
     let expires_at = Date.now() + 1000 * 60 * 60 * 24 * 365;
     expires_at = new Date(expires_at).toISOString();
-    await this.urlRepository.save(
-      code,
-      name,
-      originalUrl,
-      visits,
-      shortLink,
-      type,
-      isEnabled,
-      expires_at,
-      user_id
-    );
+    try {
+      const url = await this.urlRepository.save(
+        code,
+        name,
+        originalUrl,
+        visits,
+        shortLink,
+        type,
+        isEnabled,
+        expires_at,
+        user_id
+      );
+      return url;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      return null;
+    }
   }
 
   async getUrl(id) {
@@ -36,7 +42,11 @@ export default class UrlService {
   async getUrls(userId) {
     try {
       const urls = await this.urlRepository.getAll(userId);
-      return urls.rows;
+      if (!urls) {
+        log.error('Error: No urls found');
+        return null;
+      }
+      return urls;
     } catch (error) {
       log.error(`Error: ${error.message}`);
       return null;

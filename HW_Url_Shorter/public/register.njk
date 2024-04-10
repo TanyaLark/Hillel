@@ -156,6 +156,11 @@
               window.location.replace('/url/all');
             }
 
+            if (response.status === 400) {
+            const data = await response.json();
+              alert(data.message);
+            }
+
             if (response.status === 401) {
               alert('User already exists');
             }

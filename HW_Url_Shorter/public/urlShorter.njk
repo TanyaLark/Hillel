@@ -98,8 +98,8 @@
           <tbody>
             {% for url in urls %}
             <tr>
-              <td>{{ url.original_url }}</td>
-              <td>{{ url.short_link }}</td>
+              <td>{{ url.originalUrl }}</td>
+              <td>{{ url.shortLink }}</td>
               <td>
                 <button
                   class="btn btn-warning copy-button"
@@ -146,7 +146,17 @@
               },
               body: JSON.stringify(formData),
             });
-            window.location.reload();
+
+            if (response.status === 400) {
+            const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 201){
+             window.location.replace('/url/all');
+            }
+
+            //window.location.reload();
           } catch (error) {
             console.error('Error adding url:', error);
           }

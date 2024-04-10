@@ -1,5 +1,9 @@
 import { Router } from 'express';
 import UrlService from '../services/UrlService.js';
+import {
+  validateMiddleware,
+  urlSchema,
+} from '../middlewares/validateMiddleware.js';
 export default class UrlController extends Router {
   constructor() {
     super();
@@ -19,12 +23,14 @@ export default class UrlController extends Router {
       res.render('urlShorter.njk', { urls });
     });
 
-    this.post('/create', async (req, res) => {
+    this.post('/create', validateMiddleware(urlSchema), async (req, res) => {
       const userId = req.userId;
       const { originalUrl, name } = req.body;
-      await this.urlService.create(originalUrl, name, userId);
-
-      res.send('Saved!');
+      const url = await this.urlService.create(originalUrl, name, userId);
+      if (!url) {
+        return res.status(400).send('Bad request');
+      }
+      res.status(201).send();
     });
   };
 }
