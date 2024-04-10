@@ -1,8 +1,7 @@
 import UserModel from '../models/userModel.js';
 
 export default class UserRepositoryKnex {
-  async save(name, surname, email, hashedPassword) {
-    const role = 'Admin';
+  async save(role, name, surname, email, hashedPassword) {
     return await UserModel.query().insert({ role, name, surname, email, hashedPassword });
   }
 

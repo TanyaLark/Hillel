@@ -14,15 +14,23 @@ export default class UserService {
   async create(name, surname, email, password) {
     try {
       const hashedPassword = await bcrypt.hash(password, constants.SALT);
-      await this.userRepository.save(name, surname, email, hashedPassword);
+      const users = await this.userRepository.getAll();
+      const role =
+        users.length === 0 ? constants.ROLE.ADMIN : constants.ROLE.USER;
+      const newUser = await this.userRepository.save(
+        role,
+        name,
+        surname,
+        email,
+        hashedPassword
+      );
 
-      const user = await this.userRepository.getByEmail(email);
-      if (!user) {
-        log.error('User not found');
+      if (!newUser) {
+        log.error('User not created');
         return null;
       }
 
-      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, {
+      const token = jwt.sign({ id: newUser.id }, constants.JWT_SECRET, {
         expiresIn: '1h',
       });
       return token;
