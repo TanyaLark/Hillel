@@ -54,7 +54,7 @@
               <div class="form-floating">
                 <img
                   class="mb-4 mt-5 w-100"
-                  src="rodinaIT.jpg"
+                  src="img/rodinaIT.jpg"
                   alt="Register"
                 />
               </div>
@@ -70,7 +70,25 @@
                 />
                 <label for="name">Name</label>
               </div>
+               <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="surname"
+                  placeholder="Surname"
+                />
+                <label for="surname">Surname</label>
+              </div>
               <div class="form-floating">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Email"
+                />
+                <label for="email">Email</label>
+              </div>
+               <div class="form-floating">
                 <input
                   type="password"
                   class="form-control"
@@ -114,10 +132,12 @@
       document
         .getElementById('userForm')
         .addEventListener('submit', async function (event) {
-          event.preventDefault(); // Prevent the default form submission
+          event.preventDefault();
 
           const formData = {
             name: document.getElementById('name').value,
+            surname: document.getElementById('surname').value,
+            email: document.getElementById('email').value,
             password: document.getElementById('password').value,
           };
           console.log(JSON.stringify(formData));

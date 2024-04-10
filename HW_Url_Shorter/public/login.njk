@@ -55,7 +55,7 @@
               <div class="form-floating">
                 <img
                 class="mb-4 mt-5 w-100"
-                src="login.jpg"
+                src="img/login.jpg"
                 alt="Login"
               />
               </div>
@@ -63,10 +63,10 @@
                 <input
                   type="text"
                   class="form-control"
-                  id="name"
-                  placeholder="name"
+                  id="email"
+                  placeholder="Email"
                 />
-                <label for="name">Name</label>
+                <label for="email">Email</label>
               </div>
               <div class="form-floating">
                 <input
@@ -114,7 +114,7 @@
           event.preventDefault(); // Запретить отправку формы по умолчанию
 
           const formData = {
-            name: document.getElementById('name').value,
+            email: document.getElementById('email').value,
             password: document.getElementById('password').value,
           };
 

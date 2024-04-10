@@ -28,12 +28,18 @@ function initPublic(app) {
     noCache: true,
   });
 
+  app.set('view engine', 'njk');
+
   app.get('/', (req, res) => {
-    res.render('index.njk');
+    res.render('register.njk');
+  });
+
+  app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'img', 'favicon.ico'));
   });
 
   app.get('/login', (req, res) => {
-    res.render('login.html');
+    res.render('login.njk');
   });
 
   app.get('/logout', (req, res) => {
