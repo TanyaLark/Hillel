@@ -66,5 +66,11 @@ export default class UserController extends Router {
         res.status(500).send('Something broke!');
       }
     });
+
+    this.delete('/delete', authMiddleware, async (req, res) => {
+      const userId = req.userId;
+      const user = await this.userService.delete(userId);
+      res.status(200).send();
+    });
   };
 }

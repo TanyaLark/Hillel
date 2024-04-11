@@ -94,4 +94,15 @@ export default class UserService {
     const user = await this.userRepository.getByEmail(email);
     return user;
   }
+
+  async delete(userId) {
+    try {
+      const deletedUserId = await this.userRepository.delete(userId);
+      log.info(`User with id ${deletedUserId} deleted`);
+      return;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      return null;
+    }
+  }
 }
