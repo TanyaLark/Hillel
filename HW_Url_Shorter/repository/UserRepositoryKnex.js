@@ -12,9 +12,7 @@ export default class UserRepositoryKnex {
   }
 
   async get(userId) {
-    const res = await UserModel.query()
-      .findById(userId)
-      .withGraphFetched('urls');
+    const res = await UserModel.query().findById(userId);
     return res;
   }
 
@@ -36,12 +34,5 @@ export default class UserRepositoryKnex {
       return null;
     }
     return deletedUserId;
-  }
-
-  async deleteUsers(usersIdsArray) {
-    const numberOfDeletedRows = await UserModel.query().deleteById(
-      usersIdsArray
-    );
-    return numberOfDeletedRows;
   }
 }

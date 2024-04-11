@@ -1,9 +1,11 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import UserController from './controllers/userController.js';
+import AdminController from './controllers/adminController.js';
 import UrlController from './controllers/urlController.js';
 import CodeController from './controllers/codeController.js';
 import { authMiddleware } from './middlewares/jwtMiddleware.js';
+import { adminMiddleware } from './middlewares/adminMiddleware.js';
 import path from 'path';
 import nunjucks from 'nunjucks';
 
@@ -17,6 +19,8 @@ function initControllers(app) {
   app.use('/code', new CodeController());
   app.use(authMiddleware);
   app.use('/url', new UrlController());
+  app.use(adminMiddleware);
+  app.use('/admin', new AdminController());
 }
 
 function initPublic(app) {

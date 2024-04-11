@@ -99,7 +99,7 @@ export default class UserService {
     try {
       const deletedUserId = await this.userRepository.delete(userId);
       log.info(`User with id ${deletedUserId} deleted`);
-      return;
+      return deletedUserId;
     } catch (error) {
       log.error(`Error: ${error.message}`);
       return null;
