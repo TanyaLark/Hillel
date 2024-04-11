@@ -5,12 +5,12 @@ export const authMiddleware = (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ error: 'Authorization failed' });
+    return res.status(401).json({ error: 'Authentication failed' });
   }
 
   jwt.verify(token, constants.JWT_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).json({ error: 'Authorization failed' });
+      return res.status(401).json({ error: 'Authentication failed' });
     }
     req.userId = decoded.id;
     next();
