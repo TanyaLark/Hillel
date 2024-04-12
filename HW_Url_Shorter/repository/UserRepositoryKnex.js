@@ -35,4 +35,15 @@ export default class UserRepositoryKnex {
     }
     return deletedUserId;
   }
+
+  async updateRole(email, role) {
+    const updatedUser = await UserModel.query()
+      .patch({ role })
+      .where('email', email)
+      .returning('*');
+    if (!updatedUser) {
+      return null;
+    }
+    return updatedUser;
+  }
 }

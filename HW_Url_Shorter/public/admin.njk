@@ -76,7 +76,13 @@
             <tr>
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
-              <td>{{ user.role }}</td>
+              <td>
+                <select class="form-select role-select" aria-label="Select role" data-user="{{ user.email }}">
+                  <option selected>{{ user.role }}</option>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="USER">USER</option>
+                </select>
+              </td>
               <td>
                 <button
                   class="btn btn-warning delete-button"
@@ -229,6 +235,31 @@
               }
             } catch (error) {
               console.error('Error deleting user:', error);
+            }
+          });
+        });
+
+        document.querySelectorAll('.role-select').forEach((select) => {
+          select.addEventListener('change', async (event) => {
+            const email = event.target.getAttribute('data-user');
+            const role = event.target.value;
+
+            alert(`Changing role to ${role} for user ${email}`);
+
+            try {
+              const response = await fetch(`/admin/update/user`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, role }),
+              });
+
+              if (response.ok) {
+                window.location.replace('/admin');
+              }
+            } catch (error) {
+              console.error('Error updating user role:', error);
             }
           });
         });

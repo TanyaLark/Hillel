@@ -107,4 +107,14 @@ export default class UserService {
       return null;
     }
   }
+
+  async updateUserRole(email, role) {
+    try {
+      const updatedUser = await this.userRepository.updateRole(email, role);
+      return updatedUser;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      return null;
+    }
+  }
 }

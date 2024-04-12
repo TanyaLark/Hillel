@@ -43,6 +43,24 @@ export default class AdminController extends Router {
       }
     });
 
+    this.patch('/update/user', async (req, res) => {
+      const { email, role } = req.body;
+      if (!email || !role) {
+        return res.status(400).send('Bad Request');
+      }
+
+      try {
+        const updatedUser = await this.userService.updateUserRole(email, role);
+        if (!updatedUser) {
+          return res.status(404).send('User not found');
+        }
+        res.status(200).send();
+      } catch (error) {
+        log.error(`Error: ${error.message}`);
+        res.status(500).send('Something broke!');
+      }
+    });
+
     // /admin/delete?email=example@gmail.com
     this.delete('/delete', async (req, res) => {
       const userEmail = req.query.email;
