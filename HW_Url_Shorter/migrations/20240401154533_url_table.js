@@ -15,7 +15,7 @@ export function up(knex) {
     table.timestamp('created_at', { useTz: false }).defaultTo(knex.fn.now());
     table.timestamp('expires_at', { useTz: false }).nullable();
     table.integer('user_id').unsigned().notNullable();
-    table.foreign('user_id').references('id').inTable('users');
+    table.foreign('user_id').references('id').inTable('users').onDelete('CASCADE');
   });
 }
 
