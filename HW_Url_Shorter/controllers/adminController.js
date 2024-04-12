@@ -16,6 +16,11 @@ export default class AdminController extends Router {
   }
 
   init = () => {
+    this.get('/', async (req, res) => {
+      const users = await this.userService.getUsersPublicData();
+      res.render('admin.njk', { users });
+    });
+
     this.post('/create', validateMiddleware(userSchema), async (req, res) => {
       const { name, surname, email, password } = req.body;
 
@@ -25,13 +30,12 @@ export default class AdminController extends Router {
           return res.status(401).send('User already exists');
         }
 
-        const token = await this.userService.create(
+        const newUser = await this.userService.create(
           name,
           surname,
           email,
           password
         );
-        res.cookie('token', token, { httpOnly: true });
         res.status(201).send();
       } catch (error) {
         log.error(`Error: ${error.message}`);
@@ -39,12 +43,25 @@ export default class AdminController extends Router {
       }
     });
 
-    // /admin/delete?userId=id1
+    // /admin/delete?email=example@gmail.com
     this.delete('/delete', async (req, res) => {
-      const id = req.query.userId;
-      console.log('AdminController ==>',id);
-      const deletedUserId = await this.userService.delete(id);
-      res.status(200).send(`Successfully deleted user with id: ${deletedUserId}`);
+      const userEmail = req.query.email;
+      if (!userEmail) {
+        return res.status(400).send('Bad Request');
+      }
+
+      try {
+        const deletedUserId = await this.userService.delete(userEmail);
+        if (!deletedUserId) {
+          return res.status(404).send('User not found');
+        }
+        res
+          .status(200)
+          .send(`Successfully deleted user with id: ${deletedUserId}`);
+      } catch (error) {
+        log.error(`Error: ${error.message}`);
+        res.status(500).send('Something broke!');
+      }
     });
   };
 }

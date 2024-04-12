@@ -30,9 +30,9 @@
               <button
                 type="button"
                 class="btn btn-info px-2"
-                id="infoUsersList"
+                id="adminPanel"
               >
-                Users list
+                Admin panel
               </button>
             </div>
           </ul>
@@ -122,9 +122,9 @@
     ></script>
     <script>
       document
-        .getElementById('infoUsersList')
+        .getElementById('adminPanel')
         .addEventListener('click', async (event) => {
-          window.location.replace('/user/all');
+          window.location.replace('/admin');
         });
       document.getElementById('logOutButton').addEventListener('click', () => {
         window.location.replace('/logout');
