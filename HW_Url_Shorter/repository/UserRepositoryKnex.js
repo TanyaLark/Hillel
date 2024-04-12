@@ -24,10 +24,10 @@ export default class UserRepositoryKnex {
     return await UserModel.query().findOne({ email });
   }
 
-  async delete(userId) {
+  async deleteByEmail(userEmail) {
     const deletedUser = await UserModel.query()
       .delete()
-      .where('id', userId)
+      .where('email', userEmail)
       .returning('id');
     const deletedUserId = deletedUser[0].id;
     if (!deletedUserId) {

@@ -30,10 +30,7 @@ export default class UserService {
         return null;
       }
 
-      const token = jwt.sign({ id: newUser.id }, constants.JWT_SECRET, {
-        expiresIn: '1h',
-      });
-      return token;
+      return newUser;
     } catch (error) {
       log.error(`Error: ${error.message}`);
       throw error;
@@ -56,7 +53,16 @@ export default class UserService {
         return null;
       }
 
-      const token = jwt.sign({ id: user.id }, constants.JWT_SECRET, {
+      return user;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      return null;
+    }
+  }
+
+  async getToken(id) {
+    try {
+      const token = jwt.sign({ id }, constants.JWT_SECRET, {
         expiresIn: '1h',
       });
       return token;
@@ -78,16 +84,12 @@ export default class UserService {
 
   async getUsersPublicData() {
     const users = await this.userRepository.getAll();
-    const result = [];
-
-    for (const user of users) {
-      result.push({
-        id: user.id,
-        name: user.name,
-      });
-    }
-
-    return result;
+    return users.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }));
   }
 
   async getByEmail(email) {
@@ -95,9 +97,9 @@ export default class UserService {
     return user;
   }
 
-  async delete(userId) {
+  async delete(userEmail) {
     try {
-      const deletedUserId = await this.userRepository.delete(userId);
+      const deletedUserId = await this.userRepository.deleteByEmail(userEmail);
       log.info(`User with id ${deletedUserId} deleted`);
       return deletedUserId;
     } catch (error) {

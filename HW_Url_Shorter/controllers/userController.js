@@ -24,18 +24,17 @@ export default class UserController extends Router {
       res.json(user);
     });
 
-    this.get('/all', async (req, res) => {
-      const users = await this.userService.getUsersPublicData();
-      res.render('listUsers.njk', { users });
-    });
-
     this.post('/login', validateMiddleware(loginSchema), async (req, res) => {
       const { email, password } = req.body;
 
       try {
-        const token = await this.userService.login(email, password);
-        if (!token) {
+        const user = await this.userService.login(email, password);
+        if (!user) {
           return res.status(401).send('Invalid user name or password');
+        }
+        const token = await this.userService.getToken(user.id);
+        if (!token) {
+          return res.status(500).send('Token not created');
         }
         res.cookie('token', token, { httpOnly: true });
         res.status(200).send();
@@ -53,12 +52,21 @@ export default class UserController extends Router {
           return res.status(401).send('User already exists');
         }
 
-        const token = await this.userService.create(
+        const newUser = await this.userService.create(
           name,
           surname,
           email,
           password
         );
+
+        if (!newUser) {
+          return res.status(500).send('User not created');
+        }
+
+        const token = await this.userService.getToken(newUser.id);
+        if (!token) {
+          return res.status(500).send('Token not created');
+        }
         res.cookie('token', token, { httpOnly: true });
         res.status(201).send();
       } catch (error) {
