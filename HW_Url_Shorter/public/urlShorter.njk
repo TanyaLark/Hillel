@@ -169,7 +169,13 @@
           navigator.clipboard
             .writeText(url)
             .then(() => {
-              alert('Short URL copied to clipboard!');
+              const copiedMessage = document.createElement('div');
+              copiedMessage.textContent = 'Copied !';
+              copiedMessage.classList.add('copied-message');
+              button.parentNode.appendChild(copiedMessage);
+              setTimeout(() => {
+                copiedMessage.remove();
+              }, 1500);
             })
             .catch((error) => {
               console.error('Error copying URL:', error);
