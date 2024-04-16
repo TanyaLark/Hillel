@@ -124,8 +124,18 @@
       document
         .getElementById('adminPanel')
         .addEventListener('click', async (event) => {
-          window.location.replace('/admin');
+        try{
+          const response = await fetch('/admin');
+          if (response.status === 403) {
+            alert('User is not an admin.')
+          } else{
+            window.location.replace('/admin');
+          }
+        }catch(error){
+          console.error('Error:', error);
+          };
         });
+
       document.getElementById('logOutButton').addEventListener('click', () => {
         window.location.replace('/logout');
       });
