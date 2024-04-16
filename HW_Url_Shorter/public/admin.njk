@@ -42,9 +42,11 @@
             class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
           >
             <li>
-              <a href="#" class="nav-link px-2 text-secondary" id="homePage"
-                >Home</a
-              >
+              <a href="#" class="nav-link px-2 text-secondary" id="homePage">Home</a>
+            </li>
+
+             <li>
+              <a href="#" class="nav-link px-2 text-white" id="rateLimitPage">Rate limiting configuration</a>
             </li>
           </ul>
           <div class="text-end">
@@ -156,6 +158,10 @@
     <script>
       document.getElementById('homePage').addEventListener('click', () => {
         window.location.replace('/url/all');
+      });
+
+       document.getElementById('rateLimitPage').addEventListener('click', () => {
+        window.location.replace('/admin/rate/limit');
       });
 
       document

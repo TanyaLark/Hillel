@@ -21,6 +21,10 @@ export default class AdminController extends Router {
       res.render('admin.njk', { users });
     });
 
+    this.get('/rate/limit', async (req, res) => {
+      res.render('rateLimit.njk');
+    });
+
     this.post('/create', validateMiddleware(userSchema), async (req, res) => {
       const { name, surname, email, password } = req.body;
 

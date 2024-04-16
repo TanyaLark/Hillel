@@ -1,4 +1,7 @@
 import UrlModel from '../models/urlModel.js';
+import logger from 'logger';
+
+const log = logger.getLogger('UrlRepository.js');
 
 export default class UrlRepository {
   async save(
@@ -34,7 +37,13 @@ export default class UrlRepository {
   }
 
   async getUrlByCode(code) {
-    return await UrlModel.query().findOne({ code });
+    try {
+      const url = await UrlModel.query().findOne({ code });
+      return url;
+    } catch (error) {
+      log.error(error.message);
+      return null;
+    }
   }
 
   async incrementVisits(urlId) {

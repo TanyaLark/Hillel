@@ -5,12 +5,13 @@ export default class CodeService {
     this.urlRepository = new UrlRepository();
   }
 
-  visit(code) {
-    const url = this.urlRepository.getUrlByCode(code);
+  async visit(code) {
+    const url = await this.urlRepository.getUrlByCode(code);
     if (!url) {
       throw new Error('URL not found');
     } else {
-      this.urlRepository.incrementVisits(url);
+      const urlId = url.id;
+      await this.urlRepository.incrementVisits(urlId);
     }
     return url;
   }
