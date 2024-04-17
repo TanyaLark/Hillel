@@ -24,7 +24,7 @@ export default class CodeController extends Router {
         try {
           const urlEntity = await this.codeService.visit(req.params.code);
           if (urlEntity.isEnabled === false) {
-            res.status(400).json({ status: 'error', message: 'Bad request' });
+            res.status(404).json({ status: 'error', message: 'Not found' });
             return;
           }
           const url =
