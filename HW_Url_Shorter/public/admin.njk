@@ -59,7 +59,57 @@
     </header>
 
     <div class="container text-center">
-      <div class="row row-cols-2">
+      <div class="row row-cols-1">
+        <div class="col">
+          <h2 class="mb-3 text-white">Add new user</h2>
+
+          <main class="form-signin w-25 m-auto">
+           <form id="userForm" data-bitwarden-watching="1">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  placeholder="name"
+                />
+                <label for="name">Name</label>
+              </div>
+               <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="surname"
+                  placeholder="Surname"
+                />
+                <label for="surname">Surname</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Email"
+                />
+                <label for="email">Email</label>
+              </div>
+               <div class="form-floating">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Password"
+                />
+                <label for="password">Password</label>
+              </div>
+
+              <button class="btn btn-dark mb-5 w-100 py-2" type="submit">
+                Sign up
+              </button>
+            </form>
+          </main>
+
+        </div>
+
         <div class="col">
           <h2 class="mb-3 text-white">List of existing users</h2>
           <table
@@ -99,54 +149,6 @@
         </table>
         </div>
 
-        <div class="col">
-          <h2 class="mb-3 text-white">Add new user</h2>
-
-           <form id="userForm" data-bitwarden-watching="1">
-              <div class="form-floating">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="name"
-                  placeholder="name"
-                />
-                <label for="name">Name</label>
-              </div>
-               <div class="form-floating">
-                <input
-                  type="text"
-                  class="form-control"
-                  id="surname"
-                  placeholder="Surname"
-                />
-                <label for="surname">Surname</label>
-              </div>
-              <div class="form-floating">
-                <input
-                  type="email"
-                  class="form-control"
-                  id="email"
-                  placeholder="Email"
-                />
-                <label for="email">Email</label>
-              </div>
-               <div class="form-floating">
-                <input
-                  type="password"
-                  class="form-control"
-                  id="password"
-                  placeholder="Password"
-                />
-                <label for="password">Password</label>
-              </div>
-
-              <button class="btn btn-dark mt-5 w-100 py-2" type="submit">
-                Sign up
-              </button>
-            </form>
-
-        </div>
-
       </div>
     </div>
 
@@ -161,7 +163,7 @@
       });
 
        document.getElementById('rateLimitPage').addEventListener('click', () => {
-        window.location.replace('/admin/rate/limit');
+        window.location.replace('/rate-limit/all');
       });
 
       document

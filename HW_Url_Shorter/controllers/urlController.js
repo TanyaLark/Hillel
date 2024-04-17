@@ -13,13 +13,13 @@ export default class UrlController extends Router {
 
   init = () => {
     this.get('/id/:id', async (req, res) => {
-      const url = await this.urlService.getUrl(req.params.id);
+      const url = await this.urlService.getUrlsByUserId(req.params.id);
       res.json(url);
     });
 
     this.get('/all', async (req, res) => {
       const userId = req.userId;
-      const urls = await this.urlService.getUrls(userId);
+      const urls = await this.urlService.getUrlsByUserId(userId);
       res.render('urlShorter.njk', { urls });
     });
 

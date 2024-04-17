@@ -4,6 +4,7 @@ import UserController from './controllers/userController.js';
 import AdminController from './controllers/adminController.js';
 import UrlController from './controllers/urlController.js';
 import CodeController from './controllers/codeController.js';
+import RateLimitController from './controllers/rateLimitController.js';
 import { authMiddleware } from './middlewares/jwtMiddleware.js';
 import { adminMiddleware } from './middlewares/adminMiddleware.js';
 import path from 'path';
@@ -21,6 +22,7 @@ function initControllers(app) {
   app.use('/url', new UrlController());
   app.use(adminMiddleware);
   app.use('/admin', new AdminController());
+  app.use('/rate-limit', new RateLimitController());
 }
 
 function initPublic(app) {

@@ -32,7 +32,11 @@ export default class UrlRepository {
     return await UrlModel.query().findById(urlId);
   }
 
-  async getAll(userId) {
+  async getAll() {
+    return await UrlModel.query();
+  }
+
+  async getAllUrlByUserId(userId) {
     return await UrlModel.query().where('user_id', userId);
   }
 

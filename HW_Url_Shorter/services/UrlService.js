@@ -39,9 +39,13 @@ export default class UrlService {
     return await this.urlRepository.get(id);
   }
 
-  async getUrls(userId) {
+  getAllUrls() {
+    return this.urlRepository.getAll();
+  }
+
+  async getUrlsByUserId(userId) {
     try {
-      const urls = await this.urlRepository.getAll(userId);
+      const urls = await this.urlRepository.getAllUrlByUserId(userId);
       if (!urls) {
         log.error('Error: No urls found');
         return null;
