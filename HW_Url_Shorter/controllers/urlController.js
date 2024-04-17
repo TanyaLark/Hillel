@@ -32,5 +32,17 @@ export default class UrlController extends Router {
       }
       res.status(201).send();
     });
+
+    this.patch('/update', async (req, res) => {
+      const data = req.body;
+      if (!data) {
+        return res.status(400).send('Bad request');
+      }
+      const urlQuantity = await this.urlService.update(data);
+      if (!urlQuantity) {
+        return res.status(404).send('Not found');
+      }
+      res.status(200).send();
+    });
   };
 }

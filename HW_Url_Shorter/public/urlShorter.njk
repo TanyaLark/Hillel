@@ -14,6 +14,18 @@
       body {
         background-color: #6c757d;
       }
+
+      #urlSwitch input:checked {
+        background-color: #0dcaf0;
+        border-color: #0d0c0b;
+      }
+
+      .centered-input {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
     </style>
   </head>
 
@@ -93,6 +105,7 @@
               <th scope="col">Original url</th>
               <th scope="col">Short url</th>
               <th scope="col">Copy short link</th>
+              <th scope="col">Enabled / Disabled</th>
             </tr>
           </thead>
           <tbody>
@@ -107,6 +120,11 @@
                 >
                   Copy
                 </button>
+              </td>
+              <td style="text-align: center;">
+                <div class="centered-input form-check form-switch form-switch-sm" id=urlSwitch>
+                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                </div>
               </td>
             </tr>
             {% endfor %}
@@ -190,6 +208,37 @@
             .catch((error) => {
               console.error('Error copying URL:', error);
             });
+        });
+      });
+
+      const urlSwitchInputs = document.querySelectorAll('.form-check-input');
+      urlSwitchInputs.forEach((input) => {
+        input.addEventListener('change', async (event) => {
+          const url = input.parentElement.parentElement.parentElement.children[1].textContent;
+          const formData = {
+            shortLink: url,
+            isEnabled: input.checked,
+          };
+          try {
+            const response = await fetch('/url/update', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+            });
+
+            if (response.status === 400) {
+              const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 404) {
+              alert('Url not found.');
+            }
+          } catch (error) {
+            console.error('Error updating url:', error);
+          }
         });
       });
     </script>

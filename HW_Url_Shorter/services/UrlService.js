@@ -56,4 +56,14 @@ export default class UrlService {
       return null;
     }
   }
+
+  async update(data) {
+    try {
+      const urlQuantity = await this.urlRepository.update(data);
+      return urlQuantity;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      return null;
+    }
+  }
 }

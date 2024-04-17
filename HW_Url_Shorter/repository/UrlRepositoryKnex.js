@@ -53,4 +53,16 @@ export default class UrlRepository {
   async incrementVisits(urlId) {
     await UrlModel.query().findById(urlId).increment('visits', 1);
   }
+
+  async update(data) {
+    const { shortLink, isEnabled } = data;
+    try {
+      return await UrlModel.query()
+        .patch({ isEnabled })
+        .where('shortLink', shortLink);
+    } catch (error) {
+      log.error(error.message);
+      return null;
+    }
+  }
 }

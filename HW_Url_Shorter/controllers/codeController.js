@@ -22,11 +22,16 @@ export default class CodeController extends Router {
       rateLimit(rateLimitConfig.forIpAddress),
       async (req, res) => {
         try {
-          const visit = await this.codeService.visit(req.params.code);
+          const urlEntity = await this.codeService.visit(req.params.code);
+          if (urlEntity.isEnabled === false) {
+            res.status(400).json({ status: 'error', message: 'Bad request' });
+            return;
+          }
           const url =
-            visit.originalUrl.startsWith('http://') || visit.originalUrl.startsWith('https://')
-              ? visit.originalUrl
-              : 'http://' + visit.originalUrl;
+            urlEntity.originalUrl.startsWith('http://') ||
+            urlEntity.originalUrl.startsWith('https://')
+              ? urlEntity.originalUrl
+              : 'http://' + urlEntity.originalUrl;
           res.redirect(302, url);
         } catch (error) {
           res.status(404).json({ status: 'error', message: error.message });
