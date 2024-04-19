@@ -134,6 +134,7 @@
               <th scope="col">Expires at</th>
               <th scope="col">Copy short link</th>
               <th scope="col"> Disabled / Enabled</th>
+              <th scope="col">Delete url</th>
             </tr>
           </thead>
           <tbody>
@@ -168,6 +169,14 @@
                   <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked">
                 </div>
                 {% endif %}
+              </td>
+              <td>
+                <button
+                  class="btn btn-warning delete-button"
+                  data-url="{{ url.id }}"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
             {% endfor %}
@@ -293,6 +302,36 @@
           }
         });
       });
+
+      const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach((button) => {
+          button.addEventListener('click', async (event) => {
+            const url = button.getAttribute('data-url');
+              try {
+                const response = await fetch(`/url/delete?id=${url}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                });
+
+                if (response.status === 200) {
+                  window.location.replace('/url/all');
+                }
+
+                if (response.status === 400) {
+                  const data = await response.json();
+                  alert(data.message);
+                }
+
+                if(response.status === 500){
+                  console.error('Internal server error');
+                }
+              } catch (error) {
+                console.error('Error deleting url:', error);
+              }
+          });
+        });
 
       document.querySelectorAll('.type-select').forEach((select) => {
         select.addEventListener('change', async (event) => {
