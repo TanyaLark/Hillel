@@ -70,17 +70,43 @@
                   class="form-control"
                   id="name"
                   placeholder="name"
+                  minlength="4" maxlength="20"
+                  required
                 />
-                <label for="name">Name</label>
+                <label for="name">Name (4-20 characters) *</label>
               </div>
               <div class="form-floating">
                 <input
-                  type="test"
+                  type="url"
                   class="form-control"
                   id="originalUrl"
-                  placeholder="Url"
+                  name="Url"
+                  placeholder="https://example.com" 
+                  required
                 />
-                <label for="originalUrl">Url</label>
+                <label for="originalUrl" required>Original url *</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="codeLength"
+                  name="length"
+                  value="5" 
+                  min="5" max="10"
+                />
+                <label for="codeLength">Code length (5-10)</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="customUrl"
+                  placeholder="Your custom url suffix"
+                  minlength="5"
+                  maxlength="10"
+                />
+                <label for="customUrl">New custom url suffix (5-10 characters)</label>
               </div>
 
               <button
@@ -104,8 +130,10 @@
             <tr>
               <th scope="col">Original url</th>
               <th scope="col">Short url</th>
+              <th scope="col">Type</th>
+              <th scope="col">Expires at</th>
               <th scope="col">Copy short link</th>
-              <th scope="col">Enabled / Disabled</th>
+              <th scope="col"> Disabled / Enabled</th>
             </tr>
           </thead>
           <tbody>
@@ -113,6 +141,15 @@
             <tr>
               <td>{{ url.originalUrl }}</td>
               <td>{{ url.shortLink }}</td>
+              <td>
+                 <select class="form-select type-select" aria-label="Select url type" data-url="{{ url.type }}">
+                  <option selected>{{ url.type }}</option>
+                  <option value="PERMANENT">PERMANENT</option>
+                  <option value="TEMPORARY">TEMPORARY </option>
+                  <option value="ONE-TIME">ONE-TIME</option>
+                </select>
+              </td>
+              <td>{{ url.expires_at }}</td>
               <td>
                 <button
                   class="btn btn-warning copy-button"
@@ -122,9 +159,15 @@
                 </button>
               </td>
               <td style="text-align: center;">
+                {% if url.isEnabled %}
                 <div class="centered-input form-check form-switch form-switch-sm" id=urlSwitch>
                   <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
                 </div>
+                {% else %}
+                <div class="centered-input form-check form-switch form-switch-sm" id=urlSwitch>
+                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked">
+                </div>
+                {% endif %}
               </td>
             </tr>
             {% endfor %}
@@ -165,7 +208,10 @@
           const formData = {
             name: document.getElementById('name').value,
             originalUrl: document.getElementById('originalUrl').value,
+            codeLength: document.getElementById('codeLength').value,
+            customUrl: document.getElementById('customUrl').value,
           };
+
           try {
             const response = await fetch('/url/create', {
               method: 'POST',
@@ -176,7 +222,7 @@
             });
 
             if (response.status === 400) {
-            const data = await response.json();
+              const data = await response.json();
               alert(data.message);
             }
 
@@ -235,6 +281,65 @@
 
             if (response.status === 404) {
               alert('Url not found.');
+            }
+
+            if (response.status === 500) {
+              console.error('Internal server error');
+            }
+
+            window.location.reload();
+          } catch (error) {
+            console.error('Error updating url:', error);
+          }
+        });
+      });
+
+      document.querySelectorAll('.type-select').forEach((select) => {
+        select.addEventListener('change', async (event) => {
+          const url = select.parentElement.parentElement.children[1].textContent;
+          const type = event.target.value;
+          const formData = {
+            shortLink: url,
+            type,
+          };
+
+          if (type === 'TEMPORARY') {
+            let minutes = prompt('Enter the number of minutes for the link to be active');
+            minutes = parseInt(minutes);
+
+            if (isNaN(minutes)) {
+              alert('Please enter a valid number');
+              return;
+            }
+
+            if (minutes > 7200) {
+              alert('Please enter a number less than 7200');
+              return;
+            }
+            // ttl = time to live
+            formData.ttl = minutes;
+          } 
+
+          try {
+            const response = await fetch('/url/update/type', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+            });
+
+            if (response.status === 400) {
+              const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 404) {
+              alert('Url not found.');
+            }
+
+            if (response.status === 200) {
+               window.location.replace('/url/all');
             }
           } catch (error) {
             console.error('Error updating url:', error);
