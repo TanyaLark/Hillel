@@ -5,4 +5,9 @@ export default {
     ADMIN: 'ADMIN',
     USER: 'USER',
   },
+  URL_TYPE: {
+    PERMANENT: 'PERMANENT',
+    TEMPORARY: 'TEMPORARY',
+    ONE_TIME: 'ONE-TIME',
+  },
 };
