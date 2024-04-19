@@ -309,11 +309,13 @@
 
             if (isNaN(minutes)) {
               alert('Please enter a valid number');
+              window.location.reload();
               return;
             }
 
             if (minutes > 7200) {
               alert('Please enter a number less than 7200');
+              window.location.reload();
               return;
             }
             // ttl = time to live
