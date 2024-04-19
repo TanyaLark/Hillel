@@ -177,4 +177,14 @@ export default class UrlService {
       return null;
     }
   }
+
+  async delete(id) {
+    try {
+      const res = await this.urlRepository.delete(id);
+      return res;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      throw error;
+    }
+  }
 }

@@ -77,5 +77,18 @@ export default class UrlController extends Router {
       }
       res.status(200).send();
     });
+
+    this.delete('/delete', async (req, res) => {
+      const urlId = req.query.id;
+      if (!urlId) {
+        return res.status(400).send({ message: 'Bad request' });
+      }
+      try {
+        const result = await this.urlService.delete(urlId);
+        return res.status(200).send();
+      } catch (error) {
+        return res.status(500).send();
+      }
+    });
   };
 }

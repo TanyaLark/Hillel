@@ -111,4 +111,14 @@ export default class UrlRepository {
       return null;
     }
   }
+
+  async delete(urlId) {
+    try {
+      const res = await UrlModel.query().deleteById(urlId);
+      return res;
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
+  }
 }
