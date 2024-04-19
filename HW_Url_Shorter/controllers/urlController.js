@@ -25,8 +25,15 @@ export default class UrlController extends Router {
 
     this.post('/create', validateMiddleware(urlSchema), async (req, res) => {
       const userId = req.userId;
-      const { originalUrl, name } = req.body;
-      const url = await this.urlService.create(originalUrl, name, userId);
+      const { originalUrl, name, codeLength, customUrl } = req.body;
+      const length = codeLength ? Number(codeLength) : 5;
+      const url = await this.urlService.create(
+        originalUrl,
+        name,
+        userId,
+        length,
+        customUrl
+      );
       if (!url) {
         return res.status(400).send('Bad request');
       }
@@ -38,8 +45,34 @@ export default class UrlController extends Router {
       if (!data) {
         return res.status(400).send('Bad request');
       }
-      const urlQuantity = await this.urlService.update(data);
-      if (!urlQuantity) {
+
+      try {
+        await this.urlService.updateUrlIsEnabled(data);
+        res.status(200).send();
+      } catch (error) {
+        if (error.message === 'URL not found') {
+          return res.status(404).send({ message: 'Not found' });
+        }
+
+        if (error.message === 'URL expired') {
+          return res.status(400).send({ message: 'URL expired' });
+        }
+        return res.status(500).send('Internal server error');
+      }
+    });
+
+    this.patch('/update/type', async (req, res) => {
+      const data = req.body;
+      if (!data) {
+        return res.status(400).send('Bad request');
+      }
+
+      if (!data.type || !data.shortLink) {
+        return res.status(400).send('Bad request');
+      }
+      const resUpdateUrl = await this.urlService.updateUrlType(data);
+
+      if (!resUpdateUrl) {
         return res.status(404).send('Not found');
       }
       res.status(200).send();

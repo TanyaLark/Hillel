@@ -13,13 +13,15 @@ export const loginSchema = Joi.object({
 });
 
 export const urlSchema = Joi.object({
-  name: Joi.string().required(),
+  name: Joi.string().min(4).max(20).required(),
   originalUrl: Joi.string().uri().required(), //  http://example.com
+  codeLength: Joi.string().min(1).max(2).optional(),
+  customUrl: Joi.string().allow('').min(5).max(10).optional(),
 });
 
 export const validateMiddleware = (schema) => (req, res, next) => {
   const { error } = schema.validate(req.body);
-  if (error) { 
+  if (error) {
     return res.status(400).send({ message: error.details[0].message });
   }
   next();

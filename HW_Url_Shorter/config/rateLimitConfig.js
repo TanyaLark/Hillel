@@ -20,7 +20,7 @@ export const rateLimitConfig = {
     },
   },
   forIpAddress: {
-    reqLimit: 2,
+    reqLimit: 10,
     windowSec: 60,
     keyGenerator: async function (req) {
       const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
