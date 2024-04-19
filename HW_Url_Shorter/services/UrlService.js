@@ -48,8 +48,7 @@ export default class UrlService {
       );
       return url;
     } catch (error) {
-      log.error(`Error: ${error.message}`);
-      return null;
+      throw error;
     }
   }
 
@@ -77,6 +76,16 @@ export default class UrlService {
     } catch (error) {
       log.error(`Error: ${error.message}`);
       return null;
+    }
+  }
+
+  async getUrlByCode(code) {
+    try {
+      const url = await this.urlRepository.getUrlByCode(code);
+      return url;
+    } catch (error) {
+      log.error(`Error: ${error.message}`);
+      throw error;
     }
   }
 

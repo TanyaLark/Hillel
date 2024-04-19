@@ -1,3 +1,4 @@
+import e from 'express';
 import UrlModel from '../models/urlModel.js';
 import logger from 'logger';
 
@@ -15,17 +16,22 @@ export default class UrlRepository {
     expires_at,
     user_id
   ) {
-    return await UrlModel.query().insert({
-      code,
-      name,
-      originalUrl,
-      visits,
-      shortLink,
-      type,
-      isEnabled,
-      expires_at,
-      user_id,
-    });
+    try {
+      return await UrlModel.query().insert({
+        code,
+        name,
+        originalUrl,
+        visits,
+        shortLink,
+        type,
+        isEnabled,
+        expires_at,
+        user_id,
+      });
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
   }
 
   async get(urlId) {
@@ -46,7 +52,7 @@ export default class UrlRepository {
       return url;
     } catch (error) {
       log.error(error.message);
-      return null;
+      throw new Error(error.message);
     }
   }
 
@@ -92,7 +98,7 @@ export default class UrlRepository {
     const { type, shortLink } = data;
     try {
       return await UrlModel.query()
-        .patch({ type, visits: 0, expires_at: null})
+        .patch({ type, visits: 0, expires_at: null })
         .where('shortLink', shortLink);
     } catch (error) {
       log.error(error.message);

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import e, { Router } from 'express';
 import UrlService from '../services/UrlService.js';
 import {
   validateMiddleware,
@@ -27,17 +27,24 @@ export default class UrlController extends Router {
       const userId = req.userId;
       const { originalUrl, name, codeLength, customUrl } = req.body;
       const length = codeLength ? Number(codeLength) : 5;
-      const url = await this.urlService.create(
-        originalUrl,
-        name,
-        userId,
-        length,
-        customUrl
-      );
-      if (!url) {
-        return res.status(400).send('Bad request');
+      try {
+        const existedUrl = await this.urlService.getUrlByCode(customUrl);
+        if (existedUrl) {
+          return res.status(400).send({ message: 'Custom URL already exists' });
+        }
+
+        const url = await this.urlService.create(
+          originalUrl,
+          name,
+          userId,
+          length,
+          customUrl
+        );
+
+        res.status(201).send();
+      } catch (error) {
+        res.status(500).send('Internal server error');
       }
-      res.status(201).send();
     });
 
     this.patch('/update', async (req, res) => {
