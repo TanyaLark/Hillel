@@ -7,7 +7,7 @@ import CodeController from './controllers/codeController.js';
 import RateLimitController from './controllers/rateLimitController.js';
 import { authMiddleware } from './middlewares/jwtMiddleware.js';
 import { adminMiddleware } from './middlewares/adminMiddleware.js';
-import path from 'path';
+import path from 'node:path';
 import nunjucks from 'nunjucks';
 
 function initMiddlewares(app) {
