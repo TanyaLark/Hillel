@@ -42,6 +42,57 @@ export default class UrlRepository {
     return await UrlModel.query();
   }
 
+  async getAllUrlsCount() {
+    try {
+      return await UrlModel.query().resultSize();
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async getUserUrlsCount(userId) {
+    try {
+      return await UrlModel.query().where('user_id', userId).resultSize();
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async getTopFiveVisitedUrls() {
+    try {
+      const topFiveVisitedUrls = await UrlModel.query().orderBy('visits', 'desc').limit(5);
+      return topFiveVisitedUrls.map((url) => {
+        return {
+          shortLink: url.shortLink,
+          visits: url.visits,
+        };
+      });
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
+  }
+
+  async getUserTopFiveVisitedUrls(userId) {
+    try {
+      const topFiveVisitedUrls = await UrlModel.query()
+        .where('user_id', userId)
+        .orderBy('visits', 'desc')
+        .limit(5);
+      return topFiveVisitedUrls.map((url) => {
+        return {
+          shortLink: url.shortLink,
+          visits: url.visits,
+        };
+      });
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
+  }
+
   async getAllUrlByUserId(userId) {
     return await UrlModel.query().where('user_id', userId);
   }

@@ -2,6 +2,7 @@ import UrlRepository from '../repository/UrlRepositoryKnex.js';
 import { generateHash } from '../utils/hashGenerator.js';
 import constants from '../common/constants.js';
 import logger from 'logger';
+import { sendEventToAll } from '../common/wsConnections.js';
 
 const log = logger.getLogger('UrlService.js');
 
@@ -49,6 +50,9 @@ export default class UrlService {
       return url;
     } catch (error) {
       throw error;
+    } finally {
+      const allUrlsCount = await this.urlRepository.getAllUrlsCount();
+      sendEventToAll('allUrlsCount', allUrlsCount);
     }
   }
 
