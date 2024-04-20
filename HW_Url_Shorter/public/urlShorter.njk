@@ -20,6 +20,10 @@
         border-color: #0d0c0b;
       }
 
+      #dashboard {
+        margin-left: 10px;
+      }
+
       .centered-input {
         display: flex;
         justify-content: center;
@@ -35,9 +39,7 @@
         <div
           class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
         >
-          <ul
-            class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
-          >
+          <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
             <div class="text-end">
               <button
                 type="button"
@@ -45,6 +47,15 @@
                 id="adminPanel"
               >
                 Admin panel
+              </button>
+            </div>
+            <div class="text-end">
+              <button
+                type="button"
+                class="btn btn-info px-2"
+                id="dashboard"
+              >
+                Dashboard
               </button>
             </div>
           </ul>
@@ -204,6 +215,12 @@
         }catch(error){
           console.error('Error:', error);
           };
+        });
+
+      document
+        .getElementById('dashboard')
+        .addEventListener('click', () => {
+          window.location.replace('/url/dashboard');
         });
 
       document.getElementById('logOutButton').addEventListener('click', () => {
