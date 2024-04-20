@@ -23,6 +23,12 @@ export default class UrlController extends Router {
       res.render('urlShorter.njk', { urls });
     });
 
+    this.get('/dashboard', async (req, res) => {
+      const userId = req.userId;
+      const urls = await this.urlService.getUrlsByUserId(userId);
+      res.render('dashboard.njk', { urls });
+    });
+
     this.post('/create', validateMiddleware(urlSchema), async (req, res) => {
       const userId = req.userId;
       const { originalUrl, name, codeLength, customUrl } = req.body;
