@@ -57,9 +57,17 @@
                     <div class="card-body">
                         <p>Total number of links: <span id="totalLinks"></span></p>
                         <p>Top 5 links by redirects:</p>
-                        <ul id="userTopLinks" class="list-group">
-                            <!-- User's top links will be dynamically populated here -->
-                        </ul>
+                        <table class="table">
+                          <thead>
+                              <tr>
+                                  <th>Short url</th>
+                                  <th>Visits</th>
+                              </tr>
+                          </thead>
+                          <tbody id="userTopLinks">
+                              <!-- User's top links will be dynamically populated here -->
+                          </tbody>
+                      </table>
                     </div>
                 </div>
             </div>
@@ -71,9 +79,17 @@
                     <div class="card-body">
                         <p>Total number of links: <span id="totalSystemLinks"></span></p>
                         <p>Top 5 overall links by redirects:</p>
-                        <ul id="systemTopLinks" class="list-group">
-                            <!-- Overall top links will be dynamically populated here -->
-                        </ul>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Short url</th>
+                                    <th>Visits</th>
+                                </tr>
+                            </thead>
+                            <tbody id="systemTopLinks">
+                                <!-- Overall top links will be dynamically populated here -->
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -88,7 +104,8 @@
                     <thead>
                         <tr>
                             <th>Code</th>
-                            <th>Limit</th>
+                            <th>Request count</th>
+                            <th>Reset time</th>
                         </tr>
                     </thead>
                     <tbody id="rateLimits">
@@ -104,7 +121,66 @@
       integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
       crossorigin="anonymous"
     ></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script>
+       const socket = io();
+
+        socket.on('userAllUrlsCount', (data) => {
+            document.getElementById('totalLinks').textContent = data;
+        });
+
+        socket.on('allUrlsCount', (data) => {
+            document.getElementById('totalSystemLinks').textContent = data;
+        });
+
+        socket.on('userTopUrls', (data) => {
+            const userTopLinks = document.getElementById('userTopLinks');
+            userTopLinks.innerHTML = '';
+            data.forEach((link) => {
+                const row = document.createElement('tr');
+                const shortUrl = document.createElement('td');
+                shortUrl.textContent = link.shortLink;
+                const visits = document.createElement('td');
+                visits.textContent = link.visits;
+                row.appendChild(shortUrl);
+                row.appendChild(visits);
+                userTopLinks.appendChild(row);
+            });
+        });
+
+        socket.on('allTopUrls', (data) => {
+            const systemTopLinks = document.getElementById('systemTopLinks');
+            systemTopLinks.innerHTML = '';
+            data.forEach((link) => {
+                const row = document.createElement('tr');
+                const shortUrl = document.createElement('td');
+                shortUrl.textContent = link.shortLink;
+                const visits = document.createElement('td');
+                visits.textContent = link.visits;
+                row.appendChild(shortUrl);
+                row.appendChild(visits);
+                systemTopLinks.appendChild(row);
+            });
+        });
+
+        socket.on('rateLimits', (data) => {
+            const rateLimits = document.getElementById('rateLimits');
+            rateLimits.innerHTML = '';
+            data.forEach((rateLimit) => {
+                const row = document.createElement('tr');
+                const code = document.createElement('td');
+                code.textContent = rateLimit.code;
+                const requestCount = document.createElement('td');
+                requestCount.textContent = rateLimit.rateLimit;
+                const resetTime = document.createElement('td');
+                resetTime.textContent = rateLimit.resetTime;
+                row.appendChild(code);
+                row.appendChild(requestCount);
+                row.appendChild(resetTime);
+                rateLimits.appendChild(row);
+            });
+        });
+
        document
         .getElementById('homePage')
         .addEventListener('click', () => {
