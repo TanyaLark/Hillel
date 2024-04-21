@@ -6,6 +6,10 @@ import { RateLimitRepository } from '../repository/RateLimitRepository.js';
 import logger from 'logger';
 import constants from '../common/constants.js';
 import { sendEventToAll } from '../common/wsConnections.js';
+import {
+  hashUserPassword,
+  verifyUserPassword,
+} from '../utils/hashUserPassword.js';
 
 const log = logger.getLogger('UserService.js');
 
@@ -18,7 +22,7 @@ export default class UserService {
 
   async create(name, surname, email, password) {
     try {
-      const hashedPassword = await bcrypt.hash(password, constants.SALT);
+      const hashedPassword = await hashUserPassword(password);
       const users = await this.userRepository.getAll();
       const role =
         users.length === 0 ? constants.ROLE.ADMIN : constants.ROLE.USER;
@@ -51,7 +55,7 @@ export default class UserService {
         return null;
       }
 
-      const passwordMatch = await bcrypt.compare(password, user.hashedPassword);
+      const passwordMatch = await verifyUserPassword(password, user.hashedPassword);
 
       if (!passwordMatch) {
         log.error('Invalid password');
@@ -116,7 +120,8 @@ export default class UserService {
       log.info(`User with id ${deletedUserId} deleted`);
 
       const getAllUrlsCount = await this.urlRepository.getAllUrlsCount();
-      const topFiveVisitedUrls = await this.urlRepository.getTopFiveVisitedUrls();
+      const topFiveVisitedUrls =
+        await this.urlRepository.getTopFiveVisitedUrls();
 
       sendEventToAll('allUrlsCount', getAllUrlsCount);
       sendEventToAll('allTopUrls', topFiveVisitedUrls);

@@ -47,17 +47,19 @@ export default class UserController extends Router {
       const { name, surname, email, password } = req.body;
 
       try {
-        const createdUser = await this.userService.getByEmail(email);
-        if (createdUser) {
+        const existingUser = await this.userService.getByEmail(email);
+        
+        if (existingUser) {
           return res.status(401).send('User already exists');
         }
-
+  
         const newUser = await this.userService.create(
           name,
           surname,
           email,
           password
         );
+        console.log("🚀 ~ UserController ~ this.post ~ newUser:", newUser)
 
         if (!newUser) {
           return res.status(500).send('User not created');

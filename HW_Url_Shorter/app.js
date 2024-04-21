@@ -10,7 +10,7 @@ import cors from 'cors';
 
 dotenv.config();
 const port = process.env.PORT || 3000;
-const appAddress = process.env.APP_ADDRESS || `localhost:${port}`;
+const appAddress = process.env.APP_ADDRESS || `http://localhost:${port}`;
 const log = logger.getLogger('app.js');
 const app = express();
 const server = createServer(app);
@@ -20,13 +20,13 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net'],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdn.jsdelivr.net', 'https://cdn.socket.io'],
       },
     },
   })
 );
 const corsOptions = {
-  origin: `http://${appAddress}`,
+  origin: appAddress,
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));

@@ -26,7 +26,8 @@ export default class UrlService {
     if (customUrl) {
       code = customUrl;
     }
-    const shortLink = `http://localhost:3000/code/${code}`;
+    const appAddress = process.env.APP_ADDRESS || 'http://localhost:3000';
+    const shortLink = `${appAddress}/code/${code}`;
     const type = constants.URL_TYPE.PERMANENT;
     const isEnabled = true;
     let expires_at;
@@ -209,7 +210,9 @@ export default class UrlService {
       const res = await this.urlRepository.delete(urlId);
 
       const allUrlsCount = await this.urlRepository.getAllUrlsCount();
-      const getUserUrlsCount = await this.urlRepository.getUserUrlsCount(userId);
+      const getUserUrlsCount = await this.urlRepository.getUserUrlsCount(
+        userId
+      );
       const userUrlsRateLimits = await getUserUrlsRateLimits(userId);
 
       sendEventToAll('allUrlsCount', allUrlsCount);

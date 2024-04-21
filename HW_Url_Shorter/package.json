@@ -5,9 +5,9 @@
   "main": "app.js",
   "scripts": {
     "start:dev": "nodemon app.js",
-    "migrate:latest": " knex --knexfile /home/tanya/Hellel/Hellel_project/Hillel/HW_Url_Shorter/config/db/knexfile.js  migrate:latest",
-    "migrate:make": "knex --knexfile /home/tanya/Hellel/Hellel_project/Hillel/HW_Url_Shorter/config/db/knexfile.js migrate:make",
-    "migrate:rollback": "knex --knexfile /home/tanya/Hellel/Hellel_project/Hillel/HW_Url_Shorter/config/db/knexfile.js migrate:rollback"
+    "migrate:latest": " knex --knexfile ./config/db/knexfile.js  migrate:latest",
+    "migrate:make": "knex --knexfile ./config/db/knexfile.js migrate:make",
+    "migrate:rollback": "knex --knexfile ./config/db/knexfile.js migrate:rollback"
   },
   "author": "",
   "license": "ISC",
@@ -23,7 +23,7 @@
     "joi": "^17.12.3",
     "jsonwebtoken": "^9.0.2",
     "knex": "^3.1.0",
-    "logger": "file:../logger",
+    "logger": "file:./logger",
     "nunjucks": "^3.2.4",
     "objection": "^3.1.4",
     "pg": "^8.11.3",
