@@ -35,7 +35,12 @@ export default class UrlRepository {
   }
 
   async get(urlId) {
-    return await UrlModel.query().findById(urlId);
+    try {
+      return await UrlModel.query().findById(urlId);
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
   }
 
   async getAll() {
@@ -62,7 +67,9 @@ export default class UrlRepository {
 
   async getTopFiveVisitedUrls() {
     try {
-      const topFiveVisitedUrls = await UrlModel.query().orderBy('visits', 'desc').limit(5);
+      const topFiveVisitedUrls = await UrlModel.query()
+        .orderBy('visits', 'desc')
+        .limit(5);
       return topFiveVisitedUrls.map((url) => {
         return {
           shortLink: url.shortLink,
@@ -94,7 +101,12 @@ export default class UrlRepository {
   }
 
   async getAllUrlByUserId(userId) {
-    return await UrlModel.query().where('user_id', userId);
+    try {
+      return await UrlModel.query().where('user_id', userId);
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
   }
 
   async getUrlByCode(code) {

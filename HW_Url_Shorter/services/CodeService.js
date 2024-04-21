@@ -1,5 +1,6 @@
 import UrlRepository from '../repository/UrlRepositoryKnex.js';
 import constants from '../common/constants.js';
+import { sendEventToAll, sendEventToUser } from '../common/wsConnections.js';
 import logger from 'logger';
 
 const log = logger.getLogger('CodeService.js');
@@ -60,6 +61,16 @@ export default class CodeService {
     } catch (error) {
       log.error(`Error: ${error.message}`);
       throw error;
+    } finally {
+      const url = await this.urlRepository.getUrlByCode(code);
+      const userId = url.user_id;
+      const topFiveVisitedUrls =
+        await this.urlRepository.getTopFiveVisitedUrls();
+      const userTopFiveVisitedUrls =
+        await this.urlRepository.getUserTopFiveVisitedUrls(userId);
+
+      sendEventToAll('allTopUrls', topFiveVisitedUrls);
+      sendEventToUser(userId, 'userTopUrls', userTopFiveVisitedUrls);
     }
   }
 }

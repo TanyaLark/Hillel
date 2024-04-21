@@ -1,14 +1,19 @@
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import UserRepositoryKnex from '../repository/UserRepositoryKnex.js';
+import UrlRepository from '../repository/UrlRepositoryKnex.js';
+import { RateLimitRepository } from '../repository/RateLimitRepository.js';
 import logger from 'logger';
 import constants from '../common/constants.js';
+import { sendEventToAll } from '../common/wsConnections.js';
 
 const log = logger.getLogger('UserService.js');
 
 export default class UserService {
   constructor() {
     this.userRepository = new UserRepositoryKnex();
+    this.urlRepository = new UrlRepository();
+    this.rateLimitRepository = new RateLimitRepository();
   }
 
   async create(name, surname, email, password) {
@@ -99,8 +104,23 @@ export default class UserService {
 
   async delete(userEmail) {
     try {
+      const userByEmail = await this.userRepository.getByEmail(userEmail);
+      const userId = userByEmail.id;
+      const allUserUrls = await this.urlRepository.getAllUrlByUserId(userId);
+      for (const url of allUserUrls) {
+        const redisRateLimitKey = `urlCode:${url.code}`;
+        await this.rateLimitRepository.deleteRateLimit(redisRateLimitKey);
+      }
+
       const deletedUserId = await this.userRepository.deleteByEmail(userEmail);
       log.info(`User with id ${deletedUserId} deleted`);
+
+      const getAllUrlsCount = await this.urlRepository.getAllUrlsCount();
+      const topFiveVisitedUrls = await this.urlRepository.getTopFiveVisitedUrls();
+
+      sendEventToAll('allUrlsCount', getAllUrlsCount);
+      sendEventToAll('allTopUrls', topFiveVisitedUrls);
+
       return deletedUserId;
     } catch (error) {
       log.error(`Error: ${error.message}`);

@@ -1,14 +1,17 @@
 import UrlRepository from '../repository/UrlRepositoryKnex.js';
+import { RateLimitRepository } from '../repository/RateLimitRepository.js';
 import { generateHash } from '../utils/hashGenerator.js';
 import constants from '../common/constants.js';
 import logger from 'logger';
-import { sendEventToAll } from '../common/wsConnections.js';
+import { sendEventToAll, sendEventToUser } from '../common/wsConnections.js';
+import { getUserUrlsRateLimits } from '../utils/rateLimitsStatistics.js';
 
 const log = logger.getLogger('UrlService.js');
 
 export default class UrlService {
   constructor() {
     this.urlRepository = new UrlRepository();
+    this.rateLimitRepository = new RateLimitRepository();
   }
 
   async create(
@@ -52,7 +55,11 @@ export default class UrlService {
       throw error;
     } finally {
       const allUrlsCount = await this.urlRepository.getAllUrlsCount();
+      const userAllUrlsCount = await this.urlRepository.getUserUrlsCount(
+        user_id
+      );
       sendEventToAll('allUrlsCount', allUrlsCount);
+      sendEventToUser(user_id, 'userAllUrlsCount', userAllUrlsCount);
     }
   }
 
@@ -191,9 +198,23 @@ export default class UrlService {
     }
   }
 
-  async delete(id) {
+  async delete(urlId) {
     try {
-      const res = await this.urlRepository.delete(id);
+      const urlById = await this.urlRepository.get(urlId);
+      if (urlById) {
+        const redisRateLimitKey = `urlCode:${urlById.code}`;
+        await this.rateLimitRepository.deleteRateLimit(redisRateLimitKey);
+      }
+
+      const res = await this.urlRepository.delete(urlId);
+
+      const allUrlsCount = await this.urlRepository.getAllUrlsCount();
+      const getUserUrlsCount = await this.urlRepository.getUserUrlsCount(userId);
+      const userUrlsRateLimits = await getUserUrlsRateLimits(userId);
+
+      sendEventToAll('allUrlsCount', allUrlsCount);
+      sendEventToUser(userId, 'userAllUrlsCount', getUserUrlsCount);
+      sendEventToUser(userId, 'rateLimits', userUrlsRateLimits);
       return res;
     } catch (error) {
       log.error(`Error: ${error.message}`);

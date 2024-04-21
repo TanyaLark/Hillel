@@ -1,4 +1,7 @@
 import UserModel from '../models/userModel.js';
+import logger from 'logger';
+
+const log = logger.getLogger('UserRepository.js');
 
 export default class UserRepositoryKnex {
   async save(role, name, surname, email, hashedPassword) {
@@ -21,7 +24,12 @@ export default class UserRepositoryKnex {
   }
 
   async getByEmail(email) {
-    return await UserModel.query().findOne({ email });
+    try {
+      return await UserModel.query().findOne({ email });
+    } catch (error) {
+      log.error(error.message);
+      throw new Error(error.message);
+    }
   }
 
   async deleteByEmail(userEmail) {
