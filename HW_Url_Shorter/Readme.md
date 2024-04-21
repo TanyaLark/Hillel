@@ -11,6 +11,6 @@ Follow these steps to get the project up and running:
   docker-compose up --build
 
 3. Open your web browser and navigate to:
-http://localhost:3000
+  http://localhost:3000
 
 4. Enjoy!
