@@ -206,11 +206,11 @@
         .getElementById('adminPanel')
         .addEventListener('click', async (event) => {
         try{
-          const response = await fetch('/admin');
+          const response = await fetch('/admin/users');
           if (response.status === 403) {
             alert('User is not an admin.')
           } else{
-            window.location.replace('/admin');
+            window.location.replace('/admin/users');
           }
         }catch(error){
           console.error('Error:', error);
