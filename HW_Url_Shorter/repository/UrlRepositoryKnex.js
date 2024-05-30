@@ -100,9 +100,10 @@ export default class UrlRepository {
     }
   }
 
-  async getAllUrlByUserId(userId) {
+  async getAllUrlByUserId(userId, page, limit) {
+    const pageNumber = parseInt(page) - 1;
     try {
-      return await UrlModel.query().where('user_id', userId);
+      return await UrlModel.query().where('user_id', userId).page(pageNumber, limit);
     } catch (error) {
       log.error(error.message);
       throw new Error(error.message);

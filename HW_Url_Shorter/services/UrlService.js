@@ -72,19 +72,29 @@ export default class UrlService {
     return this.urlRepository.getAll();
   }
 
-  async getUrlsByUserId(userId) {
+  async getUrlsByUserId(userId, page, limit) {
     try {
-      const urls = await this.urlRepository.getAllUrlByUserId(userId);
+      const urls = await this.urlRepository.getAllUrlByUserId(
+        userId,
+        page,
+        limit
+      );
+
       if (!urls) {
         log.error('Error: No urls found');
         return null;
       }
-      return urls.map((url) => {
+
+      const publicData = urls.results.map((url) => {
         if (url.expires_at) {
           url.expires_at = new Date(url.expires_at).toISOString();
         }
         return url;
       });
+
+      urls.results = publicData;
+      urls.totalPages = Math.ceil(urls.total / limit);
+      return urls;
     } catch (error) {
       log.error(`Error: ${error.message}`);
       return null;

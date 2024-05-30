@@ -19,8 +19,14 @@ export default class UrlController extends Router {
 
     this.get('/all', async (req, res) => {
       const userId = req.userId;
-      const urls = await this.urlService.getUrlsByUserId(userId);
-      res.render('urlShorter.njk', { urls });
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 2;
+      const urls = await this.urlService.getUrlsByUserId(userId, page, limit);
+      res.render('urlShorter.njk', { 
+        urls: urls.results,
+        page: page,
+        totalPages: urls.totalPages,
+       });
     });
 
     this.get('/dashboard', async (req, res) => {
