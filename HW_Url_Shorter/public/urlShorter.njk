@@ -14,6 +14,26 @@
       body {
         background-color: #6c757d;
       }
+
+      #urlSwitch input:checked {
+        background-color: #0dcaf0;
+        border-color: #0d0c0b;
+      }
+
+      #dashboard {
+        margin-left: 10px;
+      }
+
+      .centered-input {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
+
+      .page-link {
+        color: black;
+      }
     </style>
   </head>
 
@@ -23,16 +43,23 @@
         <div
           class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
         >
-          <ul
-            class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
-          >
+          <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
             <div class="text-end">
               <button
                 type="button"
                 class="btn btn-info px-2"
-                id="infoUsersList"
+                id="adminPanel"
               >
-                Users list
+                Admin panel
+              </button>
+            </div>
+            <div class="text-end">
+              <button
+                type="button"
+                class="btn btn-info px-2"
+                id="dashboard"
+              >
+                Dashboard
               </button>
             </div>
           </ul>
@@ -58,17 +85,43 @@
                   class="form-control"
                   id="name"
                   placeholder="name"
+                  minlength="4" maxlength="20"
+                  required
                 />
-                <label for="name">Name</label>
+                <label for="name">Name (4-20 characters) *</label>
               </div>
               <div class="form-floating">
                 <input
-                  type="test"
+                  type="url"
                   class="form-control"
                   id="originalUrl"
-                  placeholder="Url"
+                  name="Url"
+                  placeholder="https://example.com" 
+                  required
                 />
-                <label for="originalUrl">Url</label>
+                <label for="originalUrl" required>Original url *</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="codeLength"
+                  name="length"
+                  value="5" 
+                  min="5" max="10"
+                />
+                <label for="codeLength">Code length (5-10)</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="customUrl"
+                  placeholder="Your custom url suffix"
+                  minlength="5"
+                  maxlength="10"
+                />
+                <label for="customUrl">New custom url suffix (5-10 characters)</label>
               </div>
 
               <button
@@ -92,14 +145,27 @@
             <tr>
               <th scope="col">Original url</th>
               <th scope="col">Short url</th>
+              <th scope="col">Type</th>
+              <th scope="col">Expires at</th>
               <th scope="col">Copy short link</th>
+              <th scope="col"> Disabled / Enabled</th>
+              <th scope="col">Delete url</th>
             </tr>
           </thead>
           <tbody>
             {% for url in urls %}
             <tr>
-              <td>{{ url.original_url }}</td>
-              <td>{{ url.short_link }}</td>
+              <td>{{ url.originalUrl }}</td>
+              <td>{{ url.shortLink }}</td>
+              <td>
+                 <select class="form-select type-select" aria-label="Select url type" data-url="{{ url.type }}">
+                  <option selected>{{ url.type }}</option>
+                  <option value="PERMANENT">PERMANENT</option>
+                  <option value="TEMPORARY">TEMPORARY </option>
+                  <option value="ONE-TIME">ONE-TIME</option>
+                </select>
+              </td>
+              <td>{{ url.expires_at }}</td>
               <td>
                 <button
                   class="btn btn-warning copy-button"
@@ -108,10 +174,60 @@
                   Copy
                 </button>
               </td>
+              <td style="text-align: center;">
+                {% if url.isEnabled %}
+                <div class="centered-input form-check form-switch form-switch-sm" id=urlSwitch>
+                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked>
+                </div>
+                {% else %}
+                <div class="centered-input form-check form-switch form-switch-sm" id=urlSwitch>
+                  <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked">
+                </div>
+                {% endif %}
+              </td>
+              <td>
+                <button
+                  class="btn btn-warning delete-button"
+                  data-url="{{ url.id }}"
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if page > 1 %}
+            <li class="page-item" id="prev">
+              <a class="page-link" href="/url/all?page={{ page - 1 }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for i in range(1, totalPages + 1) %}
+              {% if i == page %}
+                <li class="page-item">
+                  <a class="page-link" href="/url/all?page={{ i }}">
+                    <strong>{{ i }}</strong>
+                  </a>
+                </li>
+              {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="/url/all?page={{ i }}">{{ i }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page < totalPages %}
+            <li class="page-item" id="next">
+              <a class="page-link" href="/url/all?page={{ page + 1 }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+
       </div>
     </div>
 
@@ -122,10 +238,26 @@
     ></script>
     <script>
       document
-        .getElementById('infoUsersList')
+        .getElementById('adminPanel')
         .addEventListener('click', async (event) => {
-          window.location.replace('/user/all');
+        try{
+          const response = await fetch('/admin/users');
+          if (response.status === 403) {
+            alert('User is not an admin.')
+          } else{
+            window.location.replace('/admin/users');
+          }
+        }catch(error){
+          console.error('Error:', error);
+          };
         });
+
+      document
+        .getElementById('dashboard')
+        .addEventListener('click', () => {
+          window.location.replace('/url/dashboard');
+        });
+
       document.getElementById('logOutButton').addEventListener('click', () => {
         window.location.replace('/logout');
       });
@@ -137,7 +269,10 @@
           const formData = {
             name: document.getElementById('name').value,
             originalUrl: document.getElementById('originalUrl').value,
+            codeLength: document.getElementById('codeLength').value,
+            customUrl: document.getElementById('customUrl').value,
           };
+
           try {
             const response = await fetch('/url/create', {
               method: 'POST',
@@ -146,7 +281,17 @@
               },
               body: JSON.stringify(formData),
             });
-            window.location.reload();
+
+            if (response.status === 400) {
+              const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 201){
+             window.location.replace('/url/all');
+            }
+
+            //window.location.reload();
           } catch (error) {
             console.error('Error adding url:', error);
           }
@@ -159,11 +304,139 @@
           navigator.clipboard
             .writeText(url)
             .then(() => {
-              alert('Short URL copied to clipboard!');
+              const copiedMessage = document.createElement('div');
+              copiedMessage.textContent = 'Copied !';
+              copiedMessage.classList.add('copied-message');
+              button.parentNode.appendChild(copiedMessage);
+              setTimeout(() => {
+                copiedMessage.remove();
+              }, 1500);
             })
             .catch((error) => {
               console.error('Error copying URL:', error);
             });
+        });
+      });
+
+      const urlSwitchInputs = document.querySelectorAll('.form-check-input');
+      urlSwitchInputs.forEach((input) => {
+        input.addEventListener('change', async (event) => {
+          const url = input.parentElement.parentElement.parentElement.children[1].textContent;
+          const formData = {
+            shortLink: url,
+            isEnabled: input.checked,
+          };
+          try {
+            const response = await fetch('/url/update', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+            });
+
+            if (response.status === 400) {
+              const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 404) {
+              alert('Url not found.');
+            }
+
+            if (response.status === 500) {
+              console.error('Internal server error');
+            }
+
+            window.location.reload();
+          } catch (error) {
+            console.error('Error updating url:', error);
+          }
+        });
+      });
+
+      const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach((button) => {
+          button.addEventListener('click', async (event) => {
+            const url = button.getAttribute('data-url');
+              try {
+                const response = await fetch(`/url/delete?id=${url}`, {
+                  method: 'DELETE',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                });
+
+                if (response.status === 200) {
+                  window.location.replace('/url/all');
+                }
+
+                if (response.status === 400) {
+                  const data = await response.json();
+                  alert(data.message);
+                }
+
+                if(response.status === 500){
+                  console.error('Internal server error');
+                }
+              } catch (error) {
+                console.error('Error deleting url:', error);
+              }
+          });
+        });
+
+      document.querySelectorAll('.type-select').forEach((select) => {
+        select.addEventListener('change', async (event) => {
+          const url = select.parentElement.parentElement.children[1].textContent;
+          const type = event.target.value;
+          const formData = {
+            shortLink: url,
+            type,
+          };
+
+          if (type === 'TEMPORARY') {
+            let minutes = prompt('Enter the number of minutes for the link to be active');
+            minutes = parseInt(minutes);
+
+            if (isNaN(minutes)) {
+              alert('Please enter a valid number');
+              window.location.reload();
+              return;
+            }
+
+            if (minutes > 7200) {
+              alert('Please enter a number less than 7200');
+              window.location.reload();
+              return;
+            }
+            // ttl = time to live
+            formData.ttl = minutes;
+          } 
+
+          try {
+            const response = await fetch('/url/update/type', {
+              method: 'PATCH',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+            });
+
+            if (response.status === 400) {
+              const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 404) {
+              alert('Url not found.');
+            }
+
+            if (response.status === 200) {
+               window.location.replace('/url/all');
+            }
+          } catch (error) {
+            console.error('Error updating url:', error);
+          }
         });
       });
     </script>

@@ -1,22 +1,30 @@
 import UrlRepository from '../repository/UrlRepositoryKnex.js';
 
-const urlRepository = new UrlRepository();
-
 export const rateLimitConfig = {
-  rateLimit1: {
-    reqLimit: 3,
+  forUserAllUrls: {
+    reqLimit: 6,
     windowSec: 60,
-    keyGenerator: function (req) {
+    keyGenerator: async function (req) {
+      const urlRepository = new UrlRepository();
       const urlCode = req.params.code;
-      const userId = urlRepository.getUrlByCode(urlCode)?.userId;
-      return userId;
+      const url = await urlRepository.getUrlByCode(urlCode);
+      const userId = url.user_id;
+      return `userId:${userId}`;
     },
   },
-  rateLimit2: {
-    reqLimit: 2,
+  forUrl: {
+    reqLimit: 8,
     windowSec: 60,
-    keyGenerator: function (req) {
-      return req.params?.code;
+    keyGenerator: async function (req) {
+      return `urlCode:${req.params?.code}`;
+    },
+  },
+  forIpAddress: {
+    reqLimit: 10,
+    windowSec: 60,
+    keyGenerator: async function (req) {
+      const ip = req.ip || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+      return `ip:${ip}`;
     },
   },
 };

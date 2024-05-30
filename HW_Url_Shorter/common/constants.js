@@ -1,4 +1,20 @@
 export default {
   SALT: 10,
   JWT_SECRET: process.env.JWT_SECRET || 'secret_key',
+  ROLE: {
+    ADMIN: 'ADMIN',
+    USER: 'USER',
+  },
+  URL_TYPE: {
+    PERMANENT: 'PERMANENT',
+    TEMPORARY: 'TEMPORARY',
+    ONE_TIME: 'ONE-TIME',
+  },
+  HASH_PASSWORD: {
+    PASSWORD_SALT_LENGTH: 16,
+    BYTE_TO_STRING_ENCODING: 'hex',
+    PASSWORD_HASH_ITERATIONS: 10000,
+    PASSWORD_LENGTH: 64,
+    DIGEST: 'sha512',
+  }
 };

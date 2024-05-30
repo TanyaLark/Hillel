@@ -1,7 +1,11 @@
 import { Router } from 'express';
 import UserService from '../services/UserService.js';
 import { authMiddleware } from '../middlewares/jwtMiddleware.js';
-import error from '../utils/customErrors.js';
+import {
+  validateMiddleware,
+  userSchema,
+  loginSchema,
+} from '../middlewares/validateMiddleware.js';
 import logger from 'logger';
 
 const log = logger.getLogger('userController.js');
@@ -20,21 +24,17 @@ export default class UserController extends Router {
       res.json(user);
     });
 
-    this.get('/all', async (req, res) => {
-      const users = await this.userService.getUsersPublicData();
-      res.render('listUsers.njk', { users });
-    });
+    this.post('/login', validateMiddleware(loginSchema), async (req, res) => {
+      const { email, password } = req.body;
 
-    this.post('/login', async (req, res) => {
-      const { name, password } = req.body;
-      if (!name || !password) {
-        log.error('Name and password are required');
-        throw new error.ValidationError('Name and password are required');
-      }
       try {
-        const token = await this.userService.login(name, password);
-        if (!token) {
+        const user = await this.userService.login(email, password);
+        if (!user) {
           return res.status(401).send('Invalid user name or password');
+        }
+        const token = await this.userService.getToken(user.id);
+        if (!token) {
+          return res.status(500).send('Token not created');
         }
         res.cookie('token', token, { httpOnly: true });
         res.status(200).send();
@@ -43,26 +43,43 @@ export default class UserController extends Router {
       }
     });
 
-    this.post('/create', async (req, res) => {
-      const { name, password } = req.body;
-      if (!name || !password) {
-        log.error('Name and password are required');
-        throw new error.ValidationError('Name and password are required');
-      }
+    this.post('/create', validateMiddleware(userSchema), async (req, res) => {
+      const { name, surname, email, password } = req.body;
 
       try {
-        const createdUser = await this.userService.getByName(name);
-        if (createdUser) {
+        const existingUser = await this.userService.getByEmail(email);
+        
+        if (existingUser) {
           return res.status(401).send('User already exists');
         }
+  
+        const newUser = await this.userService.create(
+          name,
+          surname,
+          email,
+          password
+        );
 
-        const token = await this.userService.create(name, password);
+        if (!newUser) {
+          return res.status(500).send('User not created');
+        }
+
+        const token = await this.userService.getToken(newUser.id);
+        if (!token) {
+          return res.status(500).send('Token not created');
+        }
         res.cookie('token', token, { httpOnly: true });
         res.status(201).send();
       } catch (error) {
         log.error(`Error: ${error.message}`);
         res.status(500).send('Something broke!');
       }
+    });
+
+    this.delete('/delete', authMiddleware, async (req, res) => {
+      const userId = req.userId;
+      const user = await this.userService.delete(userId);
+      res.status(200).send();
     });
   };
 }

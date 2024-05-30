@@ -1,0 +1,34 @@
+version: '2'
+services:
+  app:
+    build: .
+    ports:
+      - 3000:3000
+    env_file: .development.env
+    volumes:
+      - ./:/app/src
+      - ./migrations:/app/migrations
+    depends_on:
+      - postgres
+      - redis
+
+    links:
+      - postgres
+      - redis
+
+    command: ['npm', 'run', 'start:dev']
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: mysecretpassword
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    environment:
+      - REDIS_PORT=6379  

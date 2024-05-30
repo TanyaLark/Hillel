@@ -19,6 +19,9 @@ export default class UrlModel extends Model {
         'originalUrl',
         'visits',
         'shortLink',
+        'type',
+        'isEnabled',
+        'expires_at',
         'user_id',
       ],
 
@@ -29,6 +32,8 @@ export default class UrlModel extends Model {
         originalUrl: { type: 'string', minLength: 1, maxLength: 255 },
         visits: { type: 'integer' },
         shortLink: { type: 'string', minLength: 1, maxLength: 255 },
+        type: { type: 'string', minLength: 1, maxLength: 255 },
+        isEnabled: { type: 'boolean' },
         user_id: { type: 'integer' },
       },
     };

@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Page</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH"
+      crossorigin="anonymous"
+    />
+    <style>
+      body {
+        background-color: #6c757d;
+      }
+      
+      .page-link {
+        color: black;
+      }
+    </style>
+  </head>
+
+  <body>
+    <header class="p-3 text-bg-dark">
+      <div class="container">
+        <div
+          class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start"
+        >
+          <a
+            href="/"
+            class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none"
+          >
+            <svg
+              class="bi me-2"
+              width="40"
+              height="32"
+              role="img"
+              aria-label="Bootstrap"
+            >
+              <use xlink:href="#bootstrap"></use>
+            </svg>
+          </a>
+
+          <ul
+            class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0"
+          >
+            <li>
+              <a href="#" class="nav-link px-2 text-secondary" id="homePage">Home</a>
+            </li>
+
+             <li>
+              <a href="#" class="nav-link px-2 text-white" id="rateLimitPage">Rate limiting configuration</a>
+            </li>
+          </ul>
+          <div class="text-end">
+            <button type="button" class="btn btn-warning" id="logOutButton">
+              Log out
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="container text-center">
+      <div class="row row-cols-1">
+        <div class="col">
+          <h2 class="mb-3 text-white">Add new user</h2>
+
+          <main class="form-signin w-25 m-auto">
+           <form id="userForm" data-bitwarden-watching="1">
+              <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  placeholder="name"
+                />
+                <label for="name">Name</label>
+              </div>
+               <div class="form-floating">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="surname"
+                  placeholder="Surname"
+                />
+                <label for="surname">Surname</label>
+              </div>
+              <div class="form-floating">
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="Email"
+                />
+                <label for="email">Email</label>
+              </div>
+               <div class="form-floating">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  placeholder="Password"
+                />
+                <label for="password">Password</label>
+              </div>
+
+              <button class="btn btn-dark mb-5 w-100 py-2" type="submit">
+                Sign up
+              </button>
+            </form>
+          </main>
+
+        </div>
+
+        <div class="col">
+          <h2 class="mb-3 text-white">List of existing users</h2>
+          <table class="table table-striped table-dark table-bordered table-hover">
+          <thead class="thead-dark">
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Role</th>
+              <th scope="col">Delete user</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for user in users %}
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <select class="form-select role-select" aria-label="Select role" data-user="{{ user.email }}">
+                  <option selected>{{ user.role }}</option>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="USER">USER</option>
+                </select>
+              </td>
+              <td>
+                <button
+                  class="btn btn-warning delete-button"
+                  data-user="{{ user.email }}"
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        </div>
+
+        <nav aria-label="Page navigation example">
+          <ul class="pagination">
+            {% if page > 1 %}
+            <li class="page-item" id="prev">
+              <a class="page-link" href="/admin/users?page={{ page - 1 }}">Previous</a>
+            </li>
+            {% endif %}
+
+            {% for i in range(1, totalPages + 1) %}
+              {% if i == page %}
+                <li class="page-item">
+                  <a class="page-link" href="/admin/users?page={{ i }}">
+                    <strong>{{ i }}</strong>
+                  </a>
+                </li>
+              {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="/admin/users?page={{ i }}">{{ i }}</a>
+                </li>
+              {% endif %}
+            {% endfor %}
+
+            {% if page < totalPages %}
+            <li class="page-item" id="next">
+              <a class="page-link" href="/admin/users?page={{ page + 1 }}">Next</a>
+            </li>
+            {% endif %}
+          </ul>
+        </nav>
+
+      </div>
+    </div>
+
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      document.getElementById('homePage').addEventListener('click', () => {
+        window.location.replace('/url/all');
+      });
+
+       document.getElementById('rateLimitPage').addEventListener('click', () => {
+        window.location.replace('/rate-limit/all');
+      });
+
+      document
+        .getElementById('logOutButton')
+        .addEventListener('click', (event) => {
+          window.location.replace('/logout');
+        });
+
+       document
+        .getElementById('userForm')
+        .addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          const formData = {
+            name: document.getElementById('name').value,
+            surname: document.getElementById('surname').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+          };
+          console.log(JSON.stringify(formData));
+
+          try {
+            const response = await fetch('/admin/create', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(formData),
+              credentials: 'same-origin',
+            });
+
+            if (response.ok) {
+              window.location.replace('/admin/users');
+            }
+
+            if (response.status === 400) {
+            const data = await response.json();
+              alert(data.message);
+            }
+
+            if (response.status === 401) {
+              alert('User already exists');
+            }
+          } catch (error) {
+            alert('Error creating user:', error.message);
+            console.error('Error creating user:', error);
+          }
+        });
+
+        const deleteButtons = document.querySelectorAll('.delete-button');
+        deleteButtons.forEach((button) => {
+          button.addEventListener('click', async (event) => {
+            const email = button.getAttribute('data-user');
+            try {
+              const response = await fetch(`/admin/delete?email=${email}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+
+              if (response.ok) {
+                window.location.replace('/admin/users');
+              }
+
+              if (response.status === 400) {
+                const data = await response.json();
+                alert(data.message);
+              }
+
+              if (response.status === 401) {
+                alert('User does not exist');
+              }
+
+              if(response.status === 500){
+                console.log('Error deleting user');
+              }
+            } catch (error) {
+              console.error('Error deleting user:', error);
+            }
+          });
+        });
+
+        document.querySelectorAll('.role-select').forEach((select) => {
+          select.addEventListener('change', async (event) => {
+            const email = event.target.getAttribute('data-user');
+            const role = event.target.value;
+
+            alert(`Changing role to ${role} for user ${email}`);
+
+            try {
+              const response = await fetch(`/admin/update/user`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, role }),
+              });
+
+              if (response.ok) {
+                window.location.replace('/admin/users');
+              }
+            } catch (error) {
+              console.error('Error updating user role:', error);
+            }
+          });
+        });
+    </script>
+  </body>
+</html>

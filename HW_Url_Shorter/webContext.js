@@ -1,10 +1,13 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import UserController from './controllers/userController.js';
+import AdminController from './controllers/adminController.js';
 import UrlController from './controllers/urlController.js';
 import CodeController from './controllers/codeController.js';
+import RateLimitController from './controllers/rateLimitController.js';
 import { authMiddleware } from './middlewares/jwtMiddleware.js';
-import path from 'path';
+import { adminMiddleware } from './middlewares/adminMiddleware.js';
+import path from 'node:path';
 import nunjucks from 'nunjucks';
 
 function initMiddlewares(app) {
@@ -17,6 +20,9 @@ function initControllers(app) {
   app.use('/code', new CodeController());
   app.use(authMiddleware);
   app.use('/url', new UrlController());
+  app.use(adminMiddleware);
+  app.use('/admin', new AdminController());
+  app.use('/rate-limit', new RateLimitController());
 }
 
 function initPublic(app) {
@@ -28,12 +34,18 @@ function initPublic(app) {
     noCache: true,
   });
 
+  app.set('view engine', 'njk');
+
   app.get('/', (req, res) => {
-    res.render('index.njk');
+    res.render('register.njk');
+  });
+
+  app.get('/favicon.ico', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'img', 'favicon.ico'));
   });
 
   app.get('/login', (req, res) => {
-    res.render('login.html');
+    res.render('login.njk');
   });
 
   app.get('/logout', (req, res) => {

@@ -4,12 +4,13 @@ export function rateLimit(config) {
   return async function (req, res, next) {
     const { reqLimit, windowSec, keyGenerator } = config;
     const windowMs = windowSec * 1000;
-    const key = keyGenerator(req);
+    const key = await keyGenerator(req);
 
     try {
       if (!key) {
         return res.status(404).json({ error: 'Not found' });
       }
+      
       const now = Date.now();
       const rateLimits = await redisClient.hGetAll(key);
 
