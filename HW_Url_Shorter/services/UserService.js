@@ -101,6 +101,19 @@ export default class UserService {
     }));
   }
 
+  async getUsersForPagination(page, limit) {
+    const paginatedUsers = await this.userRepository.getForPagination(page, limit);
+    const publicData = paginatedUsers.results.map((user) => ({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }));
+    paginatedUsers.results = publicData;
+    paginatedUsers.totalPages = Math.ceil(paginatedUsers.total / limit);
+    return paginatedUsers;
+  }
+
   async getByEmail(email) {
     const user = await this.userRepository.getByEmail(email);
     return user;

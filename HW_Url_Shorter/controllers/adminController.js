@@ -16,9 +16,15 @@ export default class AdminController extends Router {
   }
 
   init = () => {
-    this.get('/', async (req, res) => {
-      const users = await this.userService.getUsersPublicData();
-      res.render('admin.njk', { users });
+    this.get('/users', async (req, res) => {
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 2;
+      const data = await this.userService.getUsersForPagination(page, limit);
+      res.render('admin.njk', {
+        users: data.results,
+        page: page,
+        totalPages: data.totalPages,
+      });
     });
 
     this.get('/rate/limit', async (req, res) => {

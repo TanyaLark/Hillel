@@ -19,6 +19,17 @@ export default class UserRepositoryKnex {
     return res;
   }
 
+  async getForPagination(page, limit) {
+    //page starts from 0.
+    //For example, if page = 0, then the first page will be returned
+    //knex return {
+      //results: [],
+      //total: 8
+    //}
+    const pageNumber = parseInt(page) - 1;
+    return await UserModel.query().page(pageNumber, limit);
+  }
+
   async getAll() {
     return await UserModel.query().select('*');
   }
