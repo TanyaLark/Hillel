@@ -59,7 +59,6 @@ export default class UserController extends Router {
           email,
           password
         );
-        console.log("🚀 ~ UserController ~ this.post ~ newUser:", newUser)
 
         if (!newUser) {
           return res.status(500).send('User not created');
